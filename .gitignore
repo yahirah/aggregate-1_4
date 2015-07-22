@@ -66,6 +66,7 @@ $RECYCLE.BIN/
 hs_err_pid*
 gwt-unitCache/
 
+**/manifests/*.txt
 *.cache.js
 *.symbolMap
 *.gwt.rpc
