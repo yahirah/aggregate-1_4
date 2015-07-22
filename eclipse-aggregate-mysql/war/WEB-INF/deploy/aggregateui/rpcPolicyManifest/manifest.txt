@@ -1,0 +1,15 @@
+# Module aggregateui
+# RPC service class, partial path of RPC policy file
+org.opendatakit.aggregate.client.form.FormAdminService, 9EEC146D6014D61A73B668E321B67B8D.gwt.rpc
+org.opendatakit.aggregate.client.form.FormService, 0501BCCE0CD037C748EE56CBBD60947C.gwt.rpc
+org.opendatakit.aggregate.client.preferences.PreferenceService, AD9DF0C3B7F4A02F22B1E6B59F5773F1.gwt.rpc
+org.opendatakit.aggregate.client.externalserv.ServicesAdminService, 8090604B90037BE64093B2F1CF4CEE6A.gwt.rpc
+org.opendatakit.common.security.client.security.SecurityService, C55E8F5A4E0A843C71E82F948E8CE147.gwt.rpc
+org.opendatakit.common.security.client.security.admin.SecurityAdminService, 980516832DA8A2ADDBEF78A1E6B5902A.gwt.rpc
+org.opendatakit.aggregate.client.preferences.OdkTablesAdminService, 9C6F35B089D59FFC688D15B237B4101E.gwt.rpc
+org.opendatakit.aggregate.client.odktables.ServerTableService, 5F7B1C085907D7DA7D2F230C2B51B952.gwt.rpc
+org.opendatakit.aggregate.client.odktables.ServerDiffService, CE6772FE57EACB14277B48F62494A47D.gwt.rpc
+org.opendatakit.aggregate.client.submission.SubmissionService, 10193519EDDEA08AAA1EC63DFAD59C3E.gwt.rpc
+org.opendatakit.aggregate.client.odktables.ServerTableACLService, D17F3C8B12D38A7B01B030FB2E10F9A0.gwt.rpc
+org.opendatakit.aggregate.client.odktables.ServerDataService, 5BE5D47E3E9404BE639072D097925B73.gwt.rpc
+org.opendatakit.aggregate.client.filter.FilterService, 548DFBA57B91B2F5EAFA6DA0DCCDCF5A.gwt.rpc
