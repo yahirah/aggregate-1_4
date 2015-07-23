@@ -31,25 +31,9 @@
 				</includes>
 			</resource>
 			<resource>
-				<targetPath>${conf.directory}/mysql</targetPath>
-				<filtering>false</filtering>
-				<directory>${toplevel.directory}/src/main/resources/mysql/</directory>
-				<includes>
-				  <include>**/*</include>
-				</includes>
-			</resource>
-			<resource>
 				<targetPath>${conf.directory}/postgresql</targetPath> <!-- name changes to postgresql -->
 				<filtering>false</filtering>
 				<directory>${toplevel.directory}/src/main/resources/postgres/</directory>
-				<includes>
-				  <include>**/*</include>
-				</includes>
-			</resource>
-			<resource>
-				<targetPath>${conf.directory}/gae</targetPath>
-				<filtering>false</filtering>
-				<directory>${toplevel.directory}/src/main/resources/gae/</directory>
 				<includes>
 				  <include>**/*</include>
 				</includes>
