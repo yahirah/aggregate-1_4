@@ -72,6 +72,9 @@ gwt-unitCache/
 *.gwt.rpc
 *.project
 *.classpath
+.idea/
+*.iml
+.settings/
 
 
 *.pydevproject

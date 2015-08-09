@@ -17,13 +17,6 @@
 
 package org.opendatakit.aggregate.servlet;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.opendatakit.aggregate.ContextFactory;
 import org.opendatakit.aggregate.form.FormFactory;
 import org.opendatakit.aggregate.form.IForm;
@@ -31,8 +24,15 @@ import org.opendatakit.aggregate.format.form.FormXmlTable;
 import org.opendatakit.aggregate.format.form.XFormsXmlTable;
 import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.persistence.exception.ODKOverQuotaException;
+import org.opendatakit.common.security.User;
 import org.opendatakit.common.web.CallingContext;
 import org.opendatakit.common.web.constants.HtmlConsts;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Servlet to generate the XML list of forms to be presented as the API for
@@ -86,7 +86,11 @@ public class FormListServlet extends ServletUtilBase {
         	formsList = newList;
         }
         XFormsXmlTable formFormatter = new XFormsXmlTable(formsList, verbose, cc.getServerURL());
-
+        User user = cc.getCurrentUser();
+        if (user.getNickname() != null) {
+      	  resp.setContentType(HtmlConsts.RESP_TYPE_XML);
+          resp.getWriter().println("<forms>" + user.getNickname()+ "</forms");
+        }
         resp.setContentType(HtmlConsts.RESP_TYPE_XML);
         formFormatter.generateXmlListOfForms(resp.getWriter(), cc);
       } catch (ODKOverQuotaException e) {
@@ -99,6 +103,11 @@ public class FormListServlet extends ServletUtilBase {
     } else {
       // Collect 1.1.5 legacy app
       try {
+    	  User user = cc.getCurrentUser();
+          if (user.getNickname() != null) {
+        	  resp.setContentType(HtmlConsts.RESP_TYPE_XML);
+              resp.getWriter().println("<forms>" + user.getNickname()+ "</forms");
+          }
         List<IForm> formsList = FormFactory.getForms(false, cc);
         FormXmlTable formFormatter = new FormXmlTable(formsList, cc.getServerURL());
 

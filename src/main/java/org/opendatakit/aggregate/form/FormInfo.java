@@ -15,10 +15,10 @@
  */
 package org.opendatakit.aggregate.form;
 
-import java.util.List;
-
 import org.opendatakit.aggregate.submission.SubmissionKey;
 import org.opendatakit.aggregate.submission.SubmissionKeyPart;
+
+import java.util.List;
 
 /**
  * Helper class for the aggregate.opendatakit.org:FormInfo form which is used 
@@ -39,6 +39,9 @@ public class FormInfo {
 	// Additional DataField -- the manifest fileset (multivalued binary content)
 
 	private static final String ELEMENT_NAME_MANIFEST_FILESET = "manifestFileset";
+
+	private static final String ELEMENT_NAME_SETTINGS_FILESET = "settingsFileset";
+
 
 	public static final String FORM_ID = FormInfo.URI_FORM_ID_VALUE_FORM_INFO;
 	
@@ -74,7 +77,7 @@ public class FormInfo {
 
 	private static boolean validFormFilesetKey(List<SubmissionKeyPart> parts) {
 
-		  if ( !validFormKey( parts ) ) {
+		  if ( !validFormKey(parts) ) {
 			  return false;
 		  }
 
@@ -128,7 +131,12 @@ public class FormInfo {
 								FormInfoFilesetTable.TABLE_NAME + "[@ordinal=1]/" +
 								ELEMENT_NAME_MANIFEST_FILESET + "[@ordinal=" + i + "]");
 	}
-
+	public static SubmissionKey getSettingsSubmissionKey(String uri, int i) {
+		return new SubmissionKey(URI_FORM_ID_VALUE_FORM_INFO + "[@version=1 and @uiVersion=0]/" +
+				FormInfoTable.TABLE_NAME + "[@key=" + uri + "]/" +
+				FormInfoFilesetTable.TABLE_NAME + "[@ordinal=1]/" +
+				ELEMENT_NAME_SETTINGS_FILESET + "[@ordinal=" + i + "]");
+	}
 	public static SubmissionKey getXformSubmissionKey(String uri, int i) {
 		return new SubmissionKey(URI_FORM_ID_VALUE_FORM_INFO + "[@version=1 and @uiVersion=0]/" + 
 								FormInfoTable.TABLE_NAME + "[@key=" + uri + "]/" + 

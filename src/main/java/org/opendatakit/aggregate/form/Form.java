@@ -70,6 +70,10 @@ class Form implements IForm {
 
   private final BinaryContentManipulator manifest;
 
+  private final BinaryContentManipulator settings;
+
+  private final FormSettingsFileTable settingsRow;
+
   /**
    * Definition of the database representation of the form submission.
    */
@@ -110,10 +114,31 @@ class Form implements IForm {
       }
     }
 
+    {
+      // get fileset (for now, zero or one record)
+      FormSettingsFileTable settingsRelation = FormSettingsFileTable.assertRelation(cc);
+      q = ds.createQuery(settingsRelation, "Form.constructor", user);
+      q.addFilter(settingsRelation.topLevelAuri, FilterOperation.EQUAL, topLevelAuri);
+
+      rows = q.executeQuery();
+      if (rows.size() == 0) {
+        settingsRow = ds.createEntityUsingRelation(settingsRelation, user);
+        settingsRow.setTopLevelAuri(topLevelAuri);
+        settingsRow.setParentAuri(topLevelAuri);
+        settingsRow.setOrdinalNumber(1L);
+      } else if (rows.size() == 1) {
+        settingsRow = (FormSettingsFileTable) rows.get(0);
+      } else {
+        throw new IllegalStateException("more than one fileset!");
+      }
+    }
+
     this.xform = FormInfoFilesetTable.assertXformManipulator(topLevelAuri, filesetRow.getUri(), cc);
 
     this.manifest = FormInfoFilesetTable.assertManifestManipulator(topLevelAuri,
         filesetRow.getUri(), cc);
+
+    this.settings = FormSettingsFileTable.assertSettingsManipulator(topLevelAuri, settingsRow.getUri(), cc);
 
     formDefinition = FormDefinition.getFormDefinition(infoRow.getStringField(FormInfoTable.FORM_ID), cc);
 
@@ -156,12 +181,26 @@ class Form implements IForm {
       filesetRow.setBooleanField(FormInfoFilesetTable.IS_ENCRYPTED_FORM, isEncryptedForm);
       filesetRow.setBooleanField(FormInfoFilesetTable.IS_DOWNLOAD_ALLOWED, isDownloadEnabled);
       filesetRow.setStringField(FormInfoFilesetTable.FORM_NAME, title);
+
+      // get fileset (for now, zero or one record)
+      FormSettingsFileTable settingsRelation = FormSettingsFileTable.assertRelation(cc);
+      settingsRow = ds.createEntityUsingRelation(settingsRelation, user);
+      settingsRow.setTopLevelAuri(topLevelAuri);
+      settingsRow.setParentAuri(topLevelAuri);
+      settingsRow.setOrdinalNumber(1L);
+      settingsRow.setBooleanField(FormSettingsFileTable.IS_DOWNLOAD_ALLOWED, isDownloadEnabled);
+      settingsRow.setStringField(FormSettingsFileTable.FORM_NAME, title);
+      infoRow.setStringField(FormSettingsFileTable.FORM_ID, rootElementDefn.formId);
+
     }
 
     this.xform = FormInfoFilesetTable.assertXformManipulator(topLevelAuri, filesetRow.getUri(), cc);
 
     this.manifest = FormInfoFilesetTable.assertManifestManipulator(topLevelAuri,
         filesetRow.getUri(), cc);
+
+    this.settings = FormSettingsFileTable.assertSettingsManipulator(topLevelAuri,
+        settingsRow.getUri(), cc);
 
     formDefinition = FormDefinition.getFormDefinition(rootElementDefn.formId, cc);
 
@@ -209,6 +248,8 @@ class Form implements IForm {
     xform.deleteAll(cc);
     ds.deleteEntity(filesetRow.getEntityKey(), user);
     ds.deleteEntity(infoRow.getEntityKey(), user);
+    ds.deleteEntity(settingsRow.getEntityKey(), user);
+
   }
 
   /**
@@ -248,7 +289,6 @@ class Form implements IForm {
     return b.toString();
   }
 
-  @Override
   public String getXFormFileHash(CallingContext cc) throws ODKDatastoreException {
     return xform.getContentHash(1, cc);
   }
@@ -274,6 +314,31 @@ class Form implements IForm {
     return manifest;
   }
 
+  public boolean hasSettingsFileset(CallingContext cc) throws ODKDatastoreException {
+    return settings.getAttachmentCount(cc) != 0;
+  }
+
+  public BinaryContentManipulator getSettingsFileset() {
+    return settings;
+  }
+
+  public String getSettingsXml(CallingContext cc) throws ODKDatastoreException {
+    if (settings.getAttachmentCount(cc) == 1) {
+      if (settings.getContentHash(1, cc) == null) {
+        return null;
+      }
+      byte[] byteArray = settings.getBlob(1, cc);
+      try {
+        return new String(byteArray, "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+        throw new IllegalStateException("UTF-8 charset not supported!");
+      }
+    } else if (settings.getAttachmentCount(cc) > 1) {
+      throw new IllegalStateException("Expecting only one fileset record at this time!");
+    }
+    return null;
+  }
   /**
    * Get the name that is viewable on ODK Aggregate
    *
