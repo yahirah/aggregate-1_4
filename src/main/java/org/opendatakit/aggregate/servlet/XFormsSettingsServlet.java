@@ -23,7 +23,7 @@ public class XFormsSettingsServlet extends ServletUtilBase {
   /**
    * Serial number for serialization
    */
-  private static final long serialVersionUID = 13886844567070038L;
+  private static final long serialVersionUID = 23886844567070038L;
 
   /**
    * URI from base
