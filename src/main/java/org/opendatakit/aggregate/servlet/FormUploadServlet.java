@@ -17,12 +17,6 @@
 
 package org.opendatakit.aggregate.servlet;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -45,6 +39,11 @@ import org.opendatakit.common.persistence.exception.ODKEntityPersistException;
 import org.opendatakit.common.web.CallingContext;
 import org.opendatakit.common.web.constants.BasicConsts;
 import org.opendatakit.common.web.constants.HtmlConsts;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Servlet to upload, parse, and save an XForm
@@ -89,6 +88,12 @@ public class FormUploadServlet extends ServletUtilBase {
       + "	  		<td><label for=\"mediaFiles\">Optional Media file(s):</label></td>"
       + "	  		<td><input id=\"mediaFiles\" class=\"gwt-Button\" type=\"file\" size=\"80,20\" name=\"datafile\" multiple /><input id=\"clear_media_files\" type=\"button\" class=\"gwt-Button\" value=\"Clear\" onClick=\"clearMediaInputField('mediaFiles')\" /></td>"
       + "	  	</tr>"
+      + "     <tr>"
+      + "	          <td><label for=\"settings\">Settings file:</label></td>"
+      + "	          <td><input id=\"settings\" class=\"gwt-Button\" type=\"file\" size=\"80\" name=\"datafile\" " +
+      "/><input id=\"settings_file\" type=\"button\" class=\"gwt-Button\" value=\"Clear\" " +
+      "onClick=\"clearMediaInputField('settings')\" /></td>"
+      + "	      </tr>"
       + "	  	<!--[if true]>"
       + "	      <tr>"
       + "	          <td><label for=\"mediaFiles2\">Media file #2:</label></td>"

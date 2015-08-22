@@ -1,7 +1,6 @@
 package org.opendatakit.aggregate.form;
 
 import org.opendatakit.common.datamodel.*;
-import org.opendatakit.common.persistence.CommonFieldsBase;
 import org.opendatakit.common.persistence.DataField;
 import org.opendatakit.common.persistence.Datastore;
 import org.opendatakit.common.persistence.PersistConsts;
@@ -13,13 +12,16 @@ import org.opendatakit.common.web.CallingContext;
  * Created by Anna on 2015-08-09.
  */
 public class FormSettingsFileTable extends DynamicBase {
-  private final String TABLE_NAME = "_form_settings_file";
+  static final String TABLE_NAME = "_form_settings";
 
   private static final String FORM_SETTINGS_REF_BLOB = "_form_settings_blb";
 
   private static final String FORM_SETTINGS_BINARY_CONTENT_REF_BLOB = "_form_settings_ref";
 
   private static final String FORM_SETTINGS_BINARY_CONTENT = "_form_settings_bin";
+
+  public static final DataField ROOT_ELEMENT_MODEL_VERSION = new DataField("ROOT_ELEMENT_MODEL_VERSION",
+      DataField.DataType.INTEGER, true);
 
   public static final DataField IS_DOWNLOAD_ALLOWED = new DataField("IS_DOWNLOAD_ALLOWED",
       DataField.DataType.BOOLEAN, true);
@@ -28,8 +30,7 @@ public class FormSettingsFileTable extends DynamicBase {
       DataField.DataType.STRING, true, PersistConsts.GUARANTEED_SEARCHABLE_LEN);
 
   public static final DataField FORM_ID = new DataField("FORM_ID", DataField.DataType.STRING,
-      false, IForm.MAX_FORM_ID_LENGTH)
-      .setIndexable(DataField.IndexType.HASH);
+      false, IForm.MAX_FORM_ID_LENGTH);
 
   public static final String URI_FORM_ID_VALUE_FORM_SETTINGS_FILE = "aggregate.opendatakit.org:FormSettingsFile";
   
@@ -38,6 +39,7 @@ public class FormSettingsFileTable extends DynamicBase {
     fieldList.add(FORM_ID);
     fieldList.add(IS_DOWNLOAD_ALLOWED);
     fieldList.add(FORM_NAME);
+    fieldList.add(ROOT_ELEMENT_MODEL_VERSION);
     fieldValueMap.put(primaryKey, FormSettingsFileTable.URI_FORM_ID_VALUE_FORM_SETTINGS_FILE);
   }
 

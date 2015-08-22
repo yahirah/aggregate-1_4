@@ -267,6 +267,7 @@ public interface IForm {
    * @throws ODKDatastoreException
    */
   public boolean setXFormMediaFile(MultiPartFormItem item, boolean overwriteOK, CallingContext cc) throws ODKDatastoreException;
-  
+  public boolean setSettingsFile(MultiPartFormItem item, boolean overwriteOK, CallingContext cc) throws
+      ODKDatastoreException;
   public String getUri();
 }

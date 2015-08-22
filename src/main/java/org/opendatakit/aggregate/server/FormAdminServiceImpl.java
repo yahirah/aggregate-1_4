@@ -487,13 +487,20 @@ public class FormAdminServiceImpl extends RemoteServiceServlet implements
       if (!form.hasValidFormDefinition())
         return mediaSummaryList; // ill-formed definition -- still show it...
 
-      BinaryContentManipulator bcm = form.getManifestFileset();
-      for (int i = 0; i < bcm.getAttachmentCount(cc); ++i) {
-        MediaFileSummary mfs = new MediaFileSummary(bcm.getUnrootedFilename(i + 1, cc),
-            bcm.getContentType(i + 1, cc), bcm.getContentLength(i + 1, cc));
+      BinaryContentManipulator bcmM = form.getManifestFileset();
+      for (int i = 0; i < bcmM.getAttachmentCount(cc); ++i) {
+        MediaFileSummary mfs = new MediaFileSummary(bcmM.getUnrootedFilename(i + 1, cc),
+            bcmM.getContentType(i + 1, cc), bcmM.getContentLength(i + 1, cc));
         mediaSummaryList.add(mfs);
       }
-      
+
+      BinaryContentManipulator bcmS = form.getSettingsFileset();
+      for (int i = 0; i < bcmS.getAttachmentCount(cc); ++i) {
+        MediaFileSummary mfs = new MediaFileSummary(bcmS.getUnrootedFilename(i + 1, cc),
+            bcmS.getContentType(i + 1, cc), bcmS.getContentLength(i + 1, cc));
+        mediaSummaryList.add(mfs);
+      }
+
       Collections.sort(mediaSummaryList, new Comparator<MediaFileSummary>() {
 
         @Override

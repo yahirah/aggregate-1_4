@@ -1149,9 +1149,8 @@
 					  </goals>
 					</execution>
 				  </executions>
-				</plugin>
-				<plugin>
-					<!-- This configures the running of integration tests -->
+				</plugin><!--
+				 <plugin>
 					<artifactId>maven-failsafe-plugin</artifactId>
 					<version>${maven.failsafe.plugin.version}</version>
 					<executions>
@@ -1208,7 +1207,6 @@
 						  <includes>
 							<include>**/integration/**</include>
 						  </includes>
-						  <!-- pass through the DISPLAY environment variable -->
 						  <environmentVariables>
 							<DISPLAY>${unix.display}</DISPLAY>
 						  </environmentVariables>
@@ -1222,7 +1220,7 @@
 							<test.server.baseUrl>${test.server.baseUrl}</test.server.baseUrl>
 						  </systemPropertyVariables>
 						</configuration>
-					  </execution>
+					  </execution> 
 					  <execution>
 						<id>verify</id>
 						<goals>
@@ -1230,7 +1228,7 @@
 						</goals>
 					  </execution>
 					</executions>
-				</plugin>
+				</plugin> -->
 				<plugin>
 					<!-- This configures an embedded Tomcat server to run the 
 						 manager app for integration testing. -->

@@ -17,12 +17,6 @@
 
 package org.opendatakit.aggregate.format.form;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
@@ -34,10 +28,17 @@ import org.opendatakit.aggregate.constants.format.XFormsTableConsts;
 import org.opendatakit.aggregate.form.IForm;
 import org.opendatakit.aggregate.servlet.FormXmlServlet;
 import org.opendatakit.aggregate.servlet.XFormsManifestServlet;
+import org.opendatakit.aggregate.servlet.XFormsSettingsServlet;
 import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.web.CallingContext;
 import org.opendatakit.common.web.constants.BasicConsts;
 import org.opendatakit.common.web.constants.HtmlConsts;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generates an OpenRosa-compliant xml description of forms for the servlet
@@ -52,6 +53,7 @@ public class XFormsXmlTable {
 
   private final String downloadRequestURL;
   private final String manifestRequestURL;
+  private final String settingsRequestURL;
   private final boolean verbose;
 
   private List<IForm> forms;
@@ -59,6 +61,7 @@ public class XFormsXmlTable {
   public XFormsXmlTable(List<IForm> formsToFormat, boolean verbose, String webServerUrl) {
     this.downloadRequestURL = webServerUrl + BasicConsts.FORWARDSLASH + FormXmlServlet.ADDR;
     this.manifestRequestURL = webServerUrl + BasicConsts.FORWARDSLASH + XFormsManifestServlet.ADDR;
+    this.settingsRequestURL = webServerUrl + BasicConsts.FORWARDSLASH + XFormsSettingsServlet.ADDR;
     this.verbose = verbose;
     this.forms = formsToFormat;
   }
@@ -161,6 +164,17 @@ public class XFormsXmlTable {
           XFormsTableConsts.MANIFEST_URL_TAG);
       xformElement.addChild(xfIdx++, Node.ELEMENT, manifestUrlElement);
       manifestUrlElement.addChild(0, Node.TEXT, urlLink);
+      xformElement.addChild(xfIdx++, Node.IGNORABLE_WHITESPACE, BasicConsts.NEW_LINE);
+    }
+    if (form.hasSettingsFileset(cc)) {
+      Map<String, String> properties = new HashMap<String, String>();
+      properties.put(ServletConsts.FORM_ID, form.getFormId());
+      String urlLink = HtmlUtil.createLinkWithProperties(settingsRequestURL, properties);
+
+      Element settingsUrlElement = d.createElement(XML_TAG_NAMESPACE,
+          XFormsTableConsts.MANIFEST_URL_TAG);
+      xformElement.addChild(xfIdx++, Node.ELEMENT, settingsUrlElement);
+      settingsUrlElement.addChild(0, Node.TEXT, urlLink);
       xformElement.addChild(xfIdx++, Node.IGNORABLE_WHITESPACE, BasicConsts.NEW_LINE);
     }
     e.addChild(idx++, Node.IGNORABLE_WHITESPACE, BasicConsts.NEW_LINE);

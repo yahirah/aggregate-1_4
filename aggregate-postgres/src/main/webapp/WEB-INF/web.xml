@@ -358,6 +358,15 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 		<servlet-name>xformsManifest</servlet-name>
 		<url-pattern>/xformsManifest</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>xformsSettings</servlet-name>
+		<servlet-class>org.opendatakit.aggregate.servlet.XFormsSettingsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>xformsSettings</servlet-name>
+		<url-pattern>/xformsSettings</url-pattern>
+	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>xformsDownload</servlet-name>

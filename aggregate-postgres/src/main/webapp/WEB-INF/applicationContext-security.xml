@@ -90,6 +90,7 @@
 		<intercept-url pattern="/xformsDownload" access="hasRole('ROLE_DATA_COLLECTOR') or hasRole('ROLE_DATA_VIEWER')" />
 		<intercept-url pattern="/xformsList" access="hasRole('ROLE_DATA_COLLECTOR') or hasRole('ROLE_DATA_VIEWER')" />
 		<intercept-url pattern="/xformsManifest" access="hasRole('ROLE_DATA_COLLECTOR') or hasRole('ROLE_DATA_VIEWER')" />
+		<intercept-url pattern="/xformsSettings" access="hasRole('ROLE_DATA_COLLECTOR') or hasRole('ROLE_DATA_VIEWER')" />
 
 		<intercept-url pattern="/www/**" access="hasRole('ROLE_USER')" />
 

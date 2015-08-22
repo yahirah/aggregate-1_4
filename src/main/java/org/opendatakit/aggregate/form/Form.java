@@ -16,16 +16,8 @@
 
 package org.opendatakit.aggregate.form;
 
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opendatakit.aggregate.client.form.FormSummary;
 import org.opendatakit.aggregate.constants.HtmlUtil;
 import org.opendatakit.aggregate.constants.ServletConsts;
@@ -48,6 +40,10 @@ import org.opendatakit.common.security.User;
 import org.opendatakit.common.web.CallingContext;
 import org.opendatakit.common.web.constants.BasicConsts;
 
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
+
 /**
  * Implementation of the IForm interface.
  * Form objects can be shared across multiple threads.
@@ -56,6 +52,8 @@ import org.opendatakit.common.web.constants.BasicConsts;
  *
  */
 class Form implements IForm {
+
+  private static final Log logger = LogFactory.getLog(Form.class.getName());
 
   /*
    * Following public fields are valid after the first successful call to
@@ -190,7 +188,7 @@ class Form implements IForm {
       settingsRow.setOrdinalNumber(1L);
       settingsRow.setBooleanField(FormSettingsFileTable.IS_DOWNLOAD_ALLOWED, isDownloadEnabled);
       settingsRow.setStringField(FormSettingsFileTable.FORM_NAME, title);
-      infoRow.setStringField(FormSettingsFileTable.FORM_ID, rootElementDefn.formId);
+      settingsRow.setStringField(FormSettingsFileTable.FORM_ID, rootElementDefn.formId);
 
     }
 
@@ -216,8 +214,10 @@ class Form implements IForm {
 
     ds.putEntity(infoRow, user);
     ds.putEntity(filesetRow, user);
+    ds.putEntity(settingsRow, user);
     manifest.persist(cc);
     xform.persist(cc);
+    settings.persist(cc);
 
     if (formDefinition != null) {
       formDefinition.persistSubmissionAssociation(cc);
@@ -246,6 +246,7 @@ class Form implements IForm {
 
     manifest.deleteAll(cc);
     xform.deleteAll(cc);
+    settings.deleteAll(cc);
     ds.deleteEntity(filesetRow.getEntityKey(), user);
     ds.deleteEntity(infoRow.getEntityKey(), user);
     ds.deleteEntity(settingsRow.getEntityKey(), user);
@@ -615,7 +616,9 @@ class Form implements IForm {
 
     String viewableURL = HtmlUtil.createHrefWithProperties(
         cc.getWebApplicationURL(FormXmlServlet.WWW_ADDR), xmlProperties, getViewableName(), false);
-    int mediaFileCount = getManifestFileset().getAttachmentCount(cc);
+    logger.warn("**************************");
+    logger.warn("File set number: " + getSettingsFileset().getAttachmentCount(cc));
+    int mediaFileCount = getManifestFileset().getAttachmentCount(cc) + getSettingsFileset().getAttachmentCount(cc);
     return new FormSummary(getViewableName(), getFormId(), getCreationDate(), getCreationUser(),
         downloadable, submit, viewableURL, mediaFileCount);
   }
@@ -753,6 +756,29 @@ class Form implements IForm {
     byte[] byteArray = item.getStream().toByteArray();
     BlobSubmissionOutcome outcome =
         manifest.setValueFromByteArray(byteArray, item.getContentType(), filePath, overwriteOK, cc);
+    return (outcome == BlobSubmissionOutcome.NEW_FILE_VERSION);
+  }
+
+  /**
+   * Media files are assumed to be in a directory one level deeper than the xml
+   * definition. So the filename reported on the mime item has an extra leading
+   * directory. Strip that off.
+   *
+   * @param item
+   * @param overwriteOK
+   * @param cc
+   * @return true if a file should be overwritten (updated); false if the file is completely new or unchanged.
+   * @throws ODKDatastoreException
+   */
+  public boolean setSettingsFile(MultiPartFormItem item, boolean overwriteOK, CallingContext cc) throws
+      ODKDatastoreException {
+    String filePath = item.getFilename();
+    if (filePath.indexOf("/") != -1) {
+      filePath = filePath.substring(filePath.indexOf("/") + 1);
+    }
+    byte[] byteArray = item.getStream().toByteArray();
+    BlobSubmissionOutcome outcome =
+        settings.setValueFromByteArray(byteArray, item.getContentType(), filePath, overwriteOK, cc);
     return (outcome == BlobSubmissionOutcome.NEW_FILE_VERSION);
   }
 

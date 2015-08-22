@@ -87,9 +87,9 @@ public class FormListServlet extends ServletUtilBase {
         }
         XFormsXmlTable formFormatter = new XFormsXmlTable(formsList, verbose, cc.getServerURL());
         User user = cc.getCurrentUser();
+    	resp.setContentType(HtmlConsts.RESP_TYPE_XML);
         if (user.getNickname() != null) {
-      	  resp.setContentType(HtmlConsts.RESP_TYPE_XML);
-          resp.getWriter().println("<forms>" + user.getNickname()+ "</forms");
+          //resp.getWriter().println("<forms>" + user.getNickname()+ "</forms");
         }
         resp.setContentType(HtmlConsts.RESP_TYPE_XML);
         formFormatter.generateXmlListOfForms(resp.getWriter(), cc);
@@ -102,11 +102,13 @@ public class FormListServlet extends ServletUtilBase {
       }
     } else {
       // Collect 1.1.5 legacy app
+	  resp.setContentType(HtmlConsts.RESP_TYPE_XML);
+
       try {
     	  User user = cc.getCurrentUser();
           if (user.getNickname() != null) {
-        	  resp.setContentType(HtmlConsts.RESP_TYPE_XML);
-              resp.getWriter().println("<forms>" + user.getNickname()+ "</forms");
+        	  //resp.setContentType(HtmlConsts.RESP_TYPE_XML);
+              //resp.getWriter().println("<forms>" + user.getNickname()+ "</forms");
           }
         List<IForm> formsList = FormFactory.getForms(false, cc);
         FormXmlTable formFormatter = new FormXmlTable(formsList, cc.getServerURL());
