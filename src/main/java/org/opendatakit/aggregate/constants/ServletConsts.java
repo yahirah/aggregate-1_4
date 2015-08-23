@@ -58,7 +58,10 @@ public final class ServletConsts {
    * Name of form field that contains the xform xml definittion (form upload)
    */
   public final static String FORM_DEF_PRAM = "form_def_file";
-
+  /**
+   * Name of  field that contains the settings name value (settings upload)
+   */
+  public final static String SETTINGS_NAME = "setings_name";
   /**
    * The name of the property that includes the form id
    */

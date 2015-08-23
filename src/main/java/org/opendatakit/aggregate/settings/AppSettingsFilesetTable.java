@@ -1,4 +1,4 @@
-package org.opendatakit.aggregate.settings_app;
+package org.opendatakit.aggregate.settings;
 
 import org.opendatakit.aggregate.datamodel.TopLevelDynamicBase;
 import org.opendatakit.common.datamodel.*;

@@ -1,7 +1,10 @@
-package org.opendatakit.aggregate.settings_app;
+package org.opendatakit.aggregate.settings;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opendatakit.aggregate.client.settings.AppSettingsSummary;
+import org.opendatakit.aggregate.constants.HtmlUtil;
+import org.opendatakit.aggregate.constants.ServletConsts;
 import org.opendatakit.aggregate.parser.MultiPartFormItem;
 import org.opendatakit.common.datamodel.BinaryContentManipulator;
 import org.opendatakit.common.persistence.CommonFieldsBase;
@@ -9,8 +12,11 @@ import org.opendatakit.common.persistence.Datastore;
 import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.security.User;
 import org.opendatakit.common.web.CallingContext;
+import org.opendatakit.common.web.constants.BasicConsts;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Anna on 2015-08-22.
@@ -21,6 +27,12 @@ public class AppSettings {
   private final AppSettingsFilesetTable settingsRow;
 
   private final BinaryContentManipulator settings;
+
+  public AppSettings(AppSettingsFilesetTable tSettingsRow, CallingContext cc) throws ODKDatastoreException {
+    this.settingsRow = tSettingsRow;
+    String topLevelAuri = tSettingsRow.getUri();
+    this.settings = AppSettingsFilesetTable.assertSettingsManipulator(topLevelAuri, settingsRow.getUri(), cc);
+  }
 
   public AppSettings(boolean isDownloadEnabled,String settingsType, CallingContext cc) throws ODKDatastoreException {
     Datastore ds = cc.getDatastore();
@@ -46,6 +58,8 @@ public class AppSettings {
     this.settings = AppSettingsFilesetTable.assertSettingsManipulator(settingsRow.getUri(),
         settingsRow.getUri(), cc);
   }
+
+
 
   public synchronized void persist(CallingContext cc) throws ODKDatastoreException {
     Datastore ds = cc.getDatastore();
@@ -88,6 +102,33 @@ public class AppSettings {
         settings.setValueFromByteArray(byteArray, item.getContentType(), filePath, overwriteOK, cc);
     return (outcome == BinaryContentManipulator.BlobSubmissionOutcome.NEW_FILE_VERSION);
   }
+  private boolean getDownloadEnabled() {
+    return settingsRow.getBooleanField(AppSettingsFilesetTable.IS_DOWNLOAD_ALLOWED);
+  }
+
+  public String getUri() { return settingsRow.getUri();  }
+
+  public Date getLastUpdateDate() { return settingsRow.getLastUpdateDate();}
+
+  private String getCreationUser() { return settingsRow.getCreatorUriUser(); }
+  public Date getCreationDate() { return settingsRow.getCreationDate(); }
+
+  public String getFileName() { return settingsRow.getStringField
+      (AppSettingsFilesetTable.SETTINGS_NAME); }
+
+  public AppSettingsSummary generateSettingsSummary(CallingContext cc) throws ODKDatastoreException {
+    boolean downloadable = getDownloadEnabled();
+    Map<String, String> xmlProperties = new HashMap<String, String>();
+    xmlProperties.put(ServletConsts.SETTINGS_NAME, getFileName());
+    xmlProperties.put(ServletConsts.HUMAN_READABLE, BasicConsts.TRUE);
+
+    String viewableURL = HtmlUtil.createHrefWithProperties(
+        cc.getWebApplicationURL("www/settingsXML"), xmlProperties, getFileName(), false);
+     int mediaFileCount = getSettingsFileset().getAttachmentCount(cc);
+    return new AppSettingsSummary(getFileName(), getCreationDate(), getCreationUser(),
+        downloadable, viewableURL, mediaFileCount);
+  }
+
 
 
 }

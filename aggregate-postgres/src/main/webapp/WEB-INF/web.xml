@@ -101,6 +101,16 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
     <url-pattern>/aggregateui/formservice</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>settingsServiceImpl</servlet-name>
+    <servlet-class>org.opendatakit.aggregate.server.SettingsServiceImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>settingsServiceImpl</servlet-name>
+    <url-pattern>/aggregateui/settingsservice</url-pattern>
+  </servlet-mapping>
+
 
   <servlet>
     <servlet-name>preferenceServiceImpl</servlet-name>

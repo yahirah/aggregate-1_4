@@ -1,4 +1,4 @@
-package org.opendatakit.aggregate.settings_app;
+package org.opendatakit.aggregate.client.settings;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Created by Anna on 2015-08-23.
  */
-public class AppSettingsSumary implements Serializable {
+public class AppSettingsSummary implements Serializable {
 
   private static final long serialVersionUID = 5320223139717436812L;
   private String name;
@@ -20,11 +20,11 @@ public class AppSettingsSumary implements Serializable {
   // number of media files associated with this form
   private int mediaFileCount = 1;
 
-  public AppSettingsSumary() {
+  public AppSettingsSummary() {
 
   }
 
-  public AppSettingsSumary(String sName, Date sCreationDate, String sCreatedUser, boolean sDownload, String sUrl, int
+  public AppSettingsSummary(String sName, Date sCreationDate, String sCreatedUser, boolean sDownload, String sUrl, int
       sCount) {
     this.name = sName;
     this.creationDate = sCreationDate;
@@ -69,11 +69,11 @@ public class AppSettingsSumary implements Serializable {
    */
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof AppSettingsSumary)) {
+    if (!(obj instanceof AppSettingsSummary)) {
       return false;
     }
 
-    AppSettingsSumary other = (AppSettingsSumary) obj;
+    AppSettingsSummary other = (AppSettingsSummary) obj;
     return (name == null ? (other.name == null) : (name.equals(other.name)));
   }
 

@@ -51,6 +51,7 @@
 
 		<intercept-url pattern="/aggregateui/formadminservice" access="hasRole('ROLE_DATA_OWNER')" />
 		<intercept-url pattern="/aggregateui/servicesadminservice" access="hasRole('ROLE_DATA_OWNER')" />
+		<intercept-url pattern="/aggregateui/settingsservice" access="hasRole('ROLE_DATA_OWNER')" />
 
 		<intercept-url pattern="/aggregateui/securityadminservice" access="hasRole('ROLE_SITE_ACCESS_ADMIN')" />
 

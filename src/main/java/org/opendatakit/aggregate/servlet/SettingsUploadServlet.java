@@ -12,7 +12,7 @@ import org.opendatakit.aggregate.constants.common.UIConsts;
 import org.opendatakit.aggregate.exception.ODKFormAlreadyExistsException;
 import org.opendatakit.aggregate.parser.MultiPartFormData;
 import org.opendatakit.aggregate.parser.MultiPartFormItem;
-import org.opendatakit.aggregate.settings_app.AppSettings;
+import org.opendatakit.aggregate.settings.AppSettings;
 import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.web.CallingContext;
 import org.opendatakit.common.web.constants.BasicConsts;

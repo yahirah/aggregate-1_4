@@ -36,6 +36,8 @@ import org.opendatakit.aggregate.client.preferences.OdkTablesAdminService;
 import org.opendatakit.aggregate.client.preferences.OdkTablesAdminServiceAsync;
 import org.opendatakit.aggregate.client.preferences.PreferenceService;
 import org.opendatakit.aggregate.client.preferences.PreferenceServiceAsync;
+import org.opendatakit.aggregate.client.settings.SettingsService;
+import org.opendatakit.aggregate.client.settings.SettingsServiceAsync;
 import org.opendatakit.aggregate.client.submission.SubmissionService;
 import org.opendatakit.aggregate.client.submission.SubmissionServiceAsync;
 import org.opendatakit.common.security.client.security.SecurityService;
@@ -62,7 +64,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
  */
 public class SecureGWT {
   public enum ServiceType {
-    FILTER, FORM, FORM_ADMIN, PREFERENCE, SECURITY, SECURITY_ADMIN, SERVICES_ADMIN, SUBMISSION,
+    FILTER, FORM, FORM_ADMIN, PREFERENCE, SECURITY, SECURITY_ADMIN, SERVICES_ADMIN, SETTINGS, SUBMISSION,
     ODK_TABLES_ADMIN, ODK_TABLES_DATA, ODK_TABLES_DIFF, ODK_TABLES_ACL, ODK_TABLES_TABLE;
   }
 
@@ -87,6 +89,7 @@ public class SecureGWT {
   private FilterServiceAsync filterServiceAsync = null;
   private SubmissionServiceAsync submissionServiceAsync = null;
   private FormServiceAsync formServiceAsync = null;
+  private SettingsServiceAsync settingsServiceAsync = null;
 
   /** data manager... */
   private FormAdminServiceAsync formAdminServiceAsync = null;
@@ -109,6 +112,7 @@ public class SecureGWT {
     submissionServiceAsync = (SubmissionServiceAsync) create(ServiceType.SUBMISSION);
     formServiceAsync = (FormServiceAsync) create(ServiceType.FORM);
     formAdminServiceAsync = (FormAdminServiceAsync) create(ServiceType.FORM_ADMIN);
+    settingsServiceAsync = (SettingsServiceAsync) create(ServiceType.SETTINGS);
     servicesAdminServiceAsync = (ServicesAdminServiceAsync) create(ServiceType.SERVICES_ADMIN);
     securityAdminServiceAsync = (SecurityAdminServiceAsync) create(ServiceType.SECURITY_ADMIN);
     odkTablesAdminServiceAsync = (OdkTablesAdminServiceAsync) create(ServiceType.ODK_TABLES_ADMIN);
@@ -141,6 +145,10 @@ public class SecureGWT {
 
   public FormAdminServiceAsync getFormAdminServiceAsync() {
     return formAdminServiceAsync;
+  }
+
+  public SettingsServiceAsync getSettingsServiceAsync() {
+    return settingsServiceAsync;
   }
 
   public ServicesAdminServiceAsync getServicesAdminServiceAsync() {
@@ -191,6 +199,9 @@ public class SecureGWT {
       break;
     case FORM_ADMIN:
       obj = GWT.create(FormAdminService.class);
+      break;
+    case SETTINGS:
+      obj = GWT.create(SettingsService.class);
       break;
     case PREFERENCE:
       obj = GWT.create(PreferenceService.class);
@@ -248,6 +259,11 @@ public class SecureGWT {
   /** data viewer... */
   public static SubmissionServiceAsync getSubmissionService() {
     return get().getSubmissionServiceAsync();
+  }
+
+  /** settings manager */
+  public static SettingsServiceAsync getSettingsService() {
+    return get().getSettingsServiceAsync();
   }
 
   /** data viewer... */

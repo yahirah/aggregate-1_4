@@ -1,13 +1,11 @@
 package org.opendatakit.aggregate.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import org.opendatakit.aggregate.client.form.FormSummary;
 import org.opendatakit.aggregate.client.preferences.Preferences;
-import org.opendatakit.aggregate.client.table.FormTable;
+import org.opendatakit.aggregate.client.settings.AppSettingsSummary;
 import org.opendatakit.aggregate.client.table.SettingsTable;
 import org.opendatakit.aggregate.client.widgets.ServletPopupButton;
 import org.opendatakit.aggregate.constants.common.UIConsts;
-import org.opendatakit.aggregate.settings_app.AppSettingsSumary;
 
 import java.util.ArrayList;
 
@@ -15,7 +13,6 @@ import java.util.ArrayList;
  * Created by Anna on 2015-08-22.
  */
 public class SettingsSubTab extends  AggregateSubTabBase {
-
 
   private static final String NEW_SETTINGS_TXT = "Add New Settings";
   private static final String NEW_SETTINGS_TOOLTIP_TXT = "Upload NEW Settings";
@@ -55,11 +52,11 @@ public class SettingsSubTab extends  AggregateSubTabBase {
   @Override
   public void update() {
     // Set up the callback object.
-    AsyncCallback<ArrayList<AppSettingsSumary>> callback = new AsyncCallback<ArrayList<AppSettingsSumary>>() {
+    AsyncCallback<ArrayList<AppSettingsSummary>> callback = new AsyncCallback<ArrayList<AppSettingsSummary>>() {
       public void onFailure(Throwable caught) {
         AggregateUI.getUI().reportError(caught);
       }
-      public void onSuccess(ArrayList<FormSummary> settings) {
+      public void onSuccess(ArrayList<AppSettingsSummary> settings) {
         AggregateUI.getUI().clearError();
         boolean resizeFormTable = false;
         boolean newShowEnketoIntegration = Preferences.showEnketoIntegration();
@@ -86,7 +83,7 @@ public class SettingsSubTab extends  AggregateSubTabBase {
     };
 
     // Make the call to the form service.
-    SecureGWT.getFormService().getForms(callback);
+    SecureGWT.getSettingsService().getSettings(callback);
 
 
   }

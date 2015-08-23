@@ -6,13 +6,9 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
-import org.opendatakit.aggregate.client.form.FormSummary;
 import org.opendatakit.aggregate.client.popups.MediaFileListPopup;
-import org.opendatakit.aggregate.client.preferences.Preferences;
 import org.opendatakit.aggregate.client.widgets.*;
-import org.opendatakit.aggregate.constants.common.FormActionStatusTimestamp;
-import org.opendatakit.aggregate.settings_app.AppSettings;
-import org.opendatakit.aggregate.settings_app.AppSettingsSumary;
+import org.opendatakit.aggregate.client.settings.AppSettingsSummary;
 import org.opendatakit.common.security.client.UserSecurityInfo;
 
 import java.util.ArrayList;
@@ -52,10 +48,10 @@ public class SettingsTable extends FlexTable {
    *
    * @param AppSettingsSumary
    */
-  public void updateSettingsTable(ArrayList<AppSettingsSumary> settings) {
+  public void updateSettingsTable(ArrayList<AppSettingsSummary> settings) {
     int i = 0;
     for (int j = 0; j < settings.size(); j++) {
-      AppSettingsSumary setting = settings.get(j);
+      AppSettingsSummary setting = settings.get(j);
       ++i;
       setWidget(i, TITLE_COLUMN, new HTML(setting.getName()));
 
