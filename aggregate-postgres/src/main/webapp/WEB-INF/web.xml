@@ -301,8 +301,6 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 	    <url-pattern> /uploadTableFromCSV</url-pattern>
 	</servlet-mapping>
 
-
-
 	<servlet>
 		<servlet-name>upload</servlet-name>
 		<servlet-class>org.opendatakit.aggregate.servlet.FormUploadServlet</servlet-class>
@@ -314,6 +312,15 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 	<servlet-mapping>
 		<servlet-name>upload</servlet-name>
 		<url-pattern>/formUpload</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>settingsUpload</servlet-name>
+		<servlet-class>org.opendatakit.aggregate.servlet.SettingsUploadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>settingsUpload</servlet-name>
+		<url-pattern>/settingsUpload</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

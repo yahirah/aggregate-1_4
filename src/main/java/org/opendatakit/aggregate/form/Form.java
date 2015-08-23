@@ -154,7 +154,6 @@ class Form implements IForm {
     FormInfoTable infoRelation = FormInfoTable.assertRelation(cc);
 
     String formUri = CommonFieldsBase.newMD5HashUri(rootElementDefn.formId);
-
     Date now = new Date();
     infoRow = ds.createEntityUsingRelation(infoRelation, user);
     infoRow.setStringField(infoRow.primaryKey, formUri);

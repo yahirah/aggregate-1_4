@@ -27,6 +27,7 @@ public enum SubTabs implements Serializable {
 	EXPORT("Exported Submissions", "export"),
 	FILTER("Filter Submissions", "filter"),
 	FORMS("Forms List", "forms"),
+  SETTINGS("Settings list", "settings"),
 	PERMISSIONS("Permissions", "permission"),
 	PREFERENCES("Preferences", "preferences"),
    TABLES("ODK Tables Admin", "tablesadmin"),

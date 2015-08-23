@@ -26,6 +26,7 @@ public class ManageTabUI extends AggregateTabBase {
     
     // build the UI    
     addSubTab(new FormsSubTab(baseUI), SubTabs.FORMS);
+    addSubTab(new SettingsSubTab(baseUI), SubTabs.SETTINGS);
     addSubTab(new PublishSubTab(), SubTabs.PUBLISH);
     addSubTab(new SubmissionAdminSubTab(), SubTabs.SUBMISSION_ADMIN);
    

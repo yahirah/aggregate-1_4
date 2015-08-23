@@ -30,6 +30,7 @@ public class UIConsts {
   public static final String FILTER_NONE = "none";
 
   public static final String FORM_UPLOAD_SERVLET_ADDR = "formUpload";
+  public static final String SETTINGS_UPLOAD_SERVLET_ADDR = "settingsUpload";
   public static final String SERVICE_ACCOUNT_PRIVATE_KEY_UPLOAD_ADDR = "ssl/oauth2-service-account";
 
   public static final String ENKETO_SERVICE_ACCOUNT_PRIVATE_KEY_UPLOAD_ADDR = "ssl/enketo-service-account";
