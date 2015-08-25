@@ -6,6 +6,7 @@ import org.opendatakit.aggregate.client.settings.AppSettingsSummary;
 import org.opendatakit.aggregate.constants.HtmlUtil;
 import org.opendatakit.aggregate.constants.ServletConsts;
 import org.opendatakit.aggregate.parser.MultiPartFormItem;
+import org.opendatakit.aggregate.servlet.SettingsXmlServlet;
 import org.opendatakit.common.datamodel.BinaryContentManipulator;
 import org.opendatakit.common.persistence.CommonFieldsBase;
 import org.opendatakit.common.persistence.Datastore;
@@ -14,6 +15,7 @@ import org.opendatakit.common.security.User;
 import org.opendatakit.common.web.CallingContext;
 import org.opendatakit.common.web.constants.BasicConsts;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +45,10 @@ public class AppSettings {
       // get fileset (for now, zero or one record)
       AppSettingsFilesetTable settingsRelation = AppSettingsFilesetTable.assertRelation(cc);
       settingsRow = ds.createEntityUsingRelation(settingsRelation, user);
-      settingsRow.setStringField(settingsRow.primaryKey, CommonFieldsBase.newMD5HashUri(settingsRow.getUri()));
+      String primaryKey = CommonFieldsBase.newMD5HashUri(settingsType);
+      logger.warn("*********************");
+      logger.warn(settingsType + primaryKey);
+      settingsRow.setStringField(settingsRow.primaryKey, primaryKey);
       settingsRow.setSubmissionDate(now);
       settingsRow.setMarkedAsCompleteDate(now);
       settingsRow.setIsComplete(true);
@@ -68,6 +73,17 @@ public class AppSettings {
     ds.putEntity(settingsRow, user);
     settings.persist(cc);
 
+  }
+
+  public synchronized void deleteSettings(CallingContext cc) throws ODKDatastoreException {
+    SettingsFactory.clearSettings(this);
+
+    Datastore ds = cc.getDatastore();
+    User user = cc.getCurrentUser();
+    // delete everything in formInfo
+
+    settings.deleteAll(cc);
+    ds.deleteEntity(settingsRow.getEntityKey(), user);
   }
 
 
@@ -123,12 +139,28 @@ public class AppSettings {
     xmlProperties.put(ServletConsts.HUMAN_READABLE, BasicConsts.TRUE);
 
     String viewableURL = HtmlUtil.createHrefWithProperties(
-        cc.getWebApplicationURL("www/settingsXML"), xmlProperties, getFileName(), false);
+        cc.getWebApplicationURL(SettingsXmlServlet.WWW_ADDR), xmlProperties, getFileName(), false);
      int mediaFileCount = getSettingsFileset().getAttachmentCount(cc);
     return new AppSettingsSummary(getFileName(), getCreationDate(), getCreationUser(),
         downloadable, viewableURL, mediaFileCount);
   }
 
 
-
+  public String getSettingsXml(CallingContext cc) throws ODKDatastoreException {
+    if (settings.getAttachmentCount(cc) == 1) {
+      if (settings.getContentHash(1, cc) == null) {
+        return null;
+      }
+      byte[] byteArray = settings.getBlob(1, cc);
+      try {
+        return new String(byteArray, "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+        throw new IllegalStateException("UTF-8 charset not supported!");
+      }
+    } else if (settings.getAttachmentCount(cc) > 1) {
+      throw new IllegalStateException("Expecting only one fileset record at this time!");
+    }
+    return null;
+  }
 }

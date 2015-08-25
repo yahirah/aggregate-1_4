@@ -442,18 +442,14 @@ public class FormParserForJavaRosa extends BaseFormParserForJavaRosa {
       // update the images if the form version changed, otherwise throw an
       // error.
 
-      log.warn("************************************");
-      log.warn(itm.getValue().getFilename());
-      log.warn(itm.getValue().getContentType());
-      log.warn("************************************");
       if(itm.getValue().getFilename().contains("settings")) {
-        log.warn("and I'm here");
+        log.info("Adding settings: " + itm.getValue().getFilename());
         if (formInfo.setSettingsFile(itm.getValue(), allowUpdates, cc)) {
           // needed update
           if (!allowUpdates) {
             // but we didn't update the form...
             throw new ODKFormAlreadyExistsException(
-                "Form media file(s) have changed.  Please update the form version and resubmit.");
+                "Form settings file(s) have changed.  Please update the form version and resubmit.");
           }
         }
         continue;

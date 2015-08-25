@@ -75,6 +75,7 @@ gwt-unitCache/
 .idea/
 *.iml
 .settings/
+aggregate-postgres/.settings/
 
 
 *.pydevproject
@@ -94,3 +95,4 @@ local.properties
 *.zip
 
 
+*.jsdtscope

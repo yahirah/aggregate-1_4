@@ -58,7 +58,7 @@ public class SettingsSubTab extends  AggregateSubTabBase {
       }
       public void onSuccess(ArrayList<AppSettingsSummary> settings) {
         AggregateUI.getUI().clearError();
-        boolean resizeFormTable = false;
+        boolean resizeFormTable = true;
         boolean newShowEnketoIntegration = Preferences.showEnketoIntegration();
         if ( newShowEnketoIntegration != showEnketoIntegration ) {
           resizeFormTable = true;

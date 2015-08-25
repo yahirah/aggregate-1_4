@@ -1,7 +1,11 @@
 package org.opendatakit.aggregate.settings;
 
 import org.opendatakit.aggregate.datamodel.TopLevelDynamicBase;
-import org.opendatakit.common.datamodel.*;
+import org.opendatakit.common.datamodel.BinaryContent;
+import org.opendatakit.common.datamodel.BinaryContentManipulator;
+import org.opendatakit.common.datamodel.BinaryContentRefBlob;
+import org.opendatakit.common.datamodel.RefBlob;
+import org.opendatakit.common.persistence.CommonFieldsBase;
 import org.opendatakit.common.persistence.DataField;
 import org.opendatakit.common.persistence.Datastore;
 import org.opendatakit.common.persistence.PersistConsts;
@@ -37,7 +41,10 @@ public class AppSettingsFilesetTable extends TopLevelDynamicBase {
     fieldList.add(IS_DOWNLOAD_ALLOWED);
     fieldList.add(SETTINGS_NAME);
     fieldList.add(ROOT_ELEMENT_MODEL_VERSION);
-    fieldValueMap.put(primaryKey, AppSettingsFilesetTable.URI_SETTINGS_ID_VALUE_APP_SETTINGS_FILE);
+    fieldValueMap.put(primaryKey, CommonFieldsBase.newMD5HashUri(AppSettingsFilesetTable
+        .URI_SETTINGS_ID_VALUE_APP_SETTINGS_FILE));
+    fieldValueMap.put(SETTINGS_NAME, AppSettingsFilesetTable
+        .URI_SETTINGS_ID_VALUE_APP_SETTINGS_FILE);
   }
 
   private AppSettingsFilesetTable(AppSettingsFilesetTable ref, User user) {

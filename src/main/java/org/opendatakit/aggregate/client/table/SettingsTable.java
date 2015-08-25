@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import org.opendatakit.aggregate.client.popups.MediaFileListPopup;
+import org.opendatakit.aggregate.client.popups.SettingsFileListPopup;
 import org.opendatakit.aggregate.client.widgets.*;
 import org.opendatakit.aggregate.client.settings.AppSettingsSummary;
 import org.opendatakit.common.security.client.UserSecurityInfo;
@@ -53,7 +54,7 @@ public class SettingsTable extends FlexTable {
     for (int j = 0; j < settings.size(); j++) {
       AppSettingsSummary setting = settings.get(j);
       ++i;
-      setWidget(i, TITLE_COLUMN, new HTML(setting.getName()));
+      setWidget(i, TITLE_COLUMN, new HTML(setting.getViewURL()));
 
       Widget mediaCount;
       if (setting.getMediaFileCount() > 0) {
@@ -65,12 +66,15 @@ public class SettingsTable extends FlexTable {
       }
       setWidget(i, MEDIA_COUNT_COLUMN, mediaCount);
 
+      setWidget(i, DOWNLOADABLE_COLUMN,
+          new HTML(setting.isDownload() ? "yes" : "no"));
+
       String user = setting.getCreatedUser();
       String displayName = UserSecurityInfo.getDisplayName(user);
       setText(i, USER_COLUMN, displayName);
 
       //setWidget(i, DOWNLOADABLE_COLUMN,  new DownloadableCheckBox(setting.getId(), setting.isDownloadable()));
-      setWidget(i, DELETE_COLUMN, new DeleteFormButton(setting.getName()));
+      setWidget(i, DELETE_COLUMN, new DeleteSettingsButton(setting.getName()));
 
       if (i % 2 == 0)
         getRowFormatter().addStyleName(i, "evenTableRow");
@@ -85,15 +89,15 @@ public class SettingsTable extends FlexTable {
 
   private class MediaFileListClickHandler implements ClickHandler {
 
-    private String formId;
+    private String name;
 
-    public MediaFileListClickHandler(String formId) {
-      this.formId = formId;
+    public MediaFileListClickHandler(String name) {
+      this.name = name;
     }
 
     @Override
     public void onClick(ClickEvent event) {
-      MediaFileListPopup mediaListpopup = new MediaFileListPopup(formId);
+      SettingsFileListPopup mediaListpopup = new SettingsFileListPopup(name);
       mediaListpopup.setPopupPositionAndShow(mediaListpopup.getPositionCallBack());
     }
 
