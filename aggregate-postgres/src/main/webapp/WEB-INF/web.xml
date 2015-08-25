@@ -347,6 +347,21 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 		<url-pattern>/www/formXml</url-pattern>
 	</servlet-mapping>
 
+
+	<servlet>
+		<servlet-name>settingsXml</servlet-name>
+		<servlet-class>org.opendatakit.aggregate.servlet.SettingsXmlServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>settingsXml</servlet-name>
+		<url-pattern>/settingsXml</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>settingsXml</servlet-name>
+		<url-pattern>/www/settingsXml</url-pattern>
+	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>formList</servlet-name>
 		<servlet-class>org.opendatakit.aggregate.servlet.FormListServlet</servlet-class>
