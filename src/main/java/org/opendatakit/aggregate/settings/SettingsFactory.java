@@ -18,7 +18,8 @@ import org.opendatakit.common.web.CallingContext;
 import java.util.*;
 
 /**
- * Created by Anna on 2015-08-23.
+ * Factory meant to handle some internal servics for app settings.
+ * @author Anna
  */
 public class SettingsFactory {
 
@@ -111,8 +112,6 @@ public class SettingsFactory {
     }
 
     for (AppSettings v : cache) {
-      logger.warn("***********SOMETHING****************" + v.getUri());
-
       if ( topLevelAuri == null || v.getUri().equals(topLevelAuri) ) {
         settings.add(v);
       }
@@ -120,13 +119,19 @@ public class SettingsFactory {
     return settings;
   }
 
+  /**
+   * Internal function for fetching single settings. Auri is hashed of a settings name.
+   * @param topLevelAuri
+   * @param cc
+   * @return
+   * @throws ODKDatastoreException
+   */
   private static AppSettings getSetting(String topLevelAuri, CallingContext cc)
       throws ODKDatastoreException {
     List<AppSettings> settings = internalGetSettings(topLevelAuri, cc);
 
     if ( settings.isEmpty() ) {
       String newUri = CommonFieldsBase.newMD5HashUri(topLevelAuri);
-      logger.warn("***********FIRST ONE IS EMPTY****************" + newUri);
       settings = internalGetSettings(newUri, cc);
       if ( settings.isEmpty() ) {
         throw new ODKEntityNotFoundException("Could not retrieve form uri: " + topLevelAuri);
@@ -137,6 +142,13 @@ public class SettingsFactory {
     return as;
   }
 
+  /**
+   * Public function for getting list of all settings.
+   * @param checkAuthorization
+   * @param cc
+   * @return
+   * @throws ODKDatastoreException
+   */
   public static final List<AppSettings> getSettings(boolean checkAuthorization, CallingContext cc)
       throws ODKDatastoreException {
     List<AppSettings> settings = internalGetSettings(null, cc);
@@ -145,7 +157,14 @@ public class SettingsFactory {
   }
 
 
-
+  /**
+   * Public function for retrieving settings by name (e.g. "admin", "global").
+   * @param name
+   * @param cc
+   * @return searched setting or null
+   * @throws ODKDatastoreException
+   * @throws ODKFormNotFoundException
+   */
   public static AppSettings retrieveSettingsByName(String name, CallingContext cc) throws ODKDatastoreException, ODKFormNotFoundException {
 
     if (name == null) {
@@ -159,13 +178,19 @@ public class SettingsFactory {
             + name);
       }
       return settings;
+
+    } catch (ODKEntityNotFoundException e) {
+      logger.warn("its null, babe");
+      return null;
     } catch (ODKDatastoreException e) {
       throw  e;
-    } catch (Exception e) {
-      throw new ODKFormNotFoundException(e);
     }
   }
 
+  /**
+   * Part of delete step, remove the settings from cache.
+   * @param match
+   */
   public static synchronized void clearSettings(AppSettings match) {
     // NOTE: delays refresh of the forms list by the settle time.
     cache.remove(match);

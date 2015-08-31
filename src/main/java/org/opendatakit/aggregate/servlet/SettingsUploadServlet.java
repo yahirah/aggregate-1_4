@@ -9,10 +9,10 @@ import org.opendatakit.aggregate.constants.ErrorConsts;
 import org.opendatakit.aggregate.constants.HtmlUtil;
 import org.opendatakit.aggregate.constants.ServletConsts;
 import org.opendatakit.aggregate.constants.common.UIConsts;
-import org.opendatakit.aggregate.exception.ODKFormAlreadyExistsException;
 import org.opendatakit.aggregate.parser.MultiPartFormData;
 import org.opendatakit.aggregate.parser.MultiPartFormItem;
 import org.opendatakit.aggregate.settings.AppSettings;
+import org.opendatakit.aggregate.settings.SettingsFactory;
 import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.web.CallingContext;
 import org.opendatakit.common.web.constants.BasicConsts;
@@ -182,49 +182,45 @@ public class SettingsUploadServlet extends ServletUtilBase {
     List<AppSettings> settings = new ArrayList<AppSettings>();
 
     try {
+
       // process settings files
 
       MultiPartFormData uploadedFormItems = new MultiPartFormData(req);
       try {
         Set<Map.Entry<String, MultiPartFormItem>> fileSet = uploadedFormItems.getFileNameEntrySet();
-        logger.warn("*********************");
-        logger.warn("number of items" + fileSet.size());
         for (Map.Entry<String, MultiPartFormItem> itm : fileSet) {
-          logger.warn("*********************");
-          logger.warn("current item" + itm.getValue().getFilename());
+          logger.info("*********************");
+          logger.info("Current item: " + itm.getValue().getFilename());
           if (itm.getValue().getFilename().contains("admin")) {
-
-            logger.warn("*********************");
-            logger.warn("and I'm here");
-            AppSettings admin = new AppSettings(true, "admin", cc);
-            if (admin.setSettingsFile(itm.getValue(), allowUpdates, cc)) {
-              // needed update
-              if (!allowUpdates) {
-                // but we didn't update the form...
-                throw new ODKFormAlreadyExistsException(
-                    "Form media file(s) have changed.  Please update the form version and resubmit.");
-              }
-
+            AppSettings existing = SettingsFactory.retrieveSettingsByName("admin", cc);
+            logger.info(existing);
+            logger.info(existing == null);
+            logger.info("*********");
+            if (existing == null) {
+              logger.warn("************ im not null");
+              AppSettings admin = new AppSettings(true, "admin", cc);
+              admin.setSettingsFile(itm.getValue(), allowUpdates, cc);
+              admin.persist(cc);
+            } else {
+              logger.info("im nul ***********");
+              existing.updateSettings(itm.getValue(), cc);
+              existing.persist(cc);
             }
-            admin.persist(cc);
           }
           if (itm.getValue().getFilename().contains("global")) {
-            logger.warn("*********************");
-            logger.warn("and I'm here2");
-            AppSettings global = new AppSettings(true, "global", cc);
-            if (global.setSettingsFile(itm.getValue(), allowUpdates, cc)) {
-              // needed update
-              if (!allowUpdates) {
-                // but we didn't update the form...
-                throw new ODKFormAlreadyExistsException(
-                    "Form media file(s) have changed.  Please update the form version and resubmit.");
+              String name = itm.getValue().getFilename();
+              AppSettings existing = SettingsFactory.retrieveSettingsByName("global", cc);
+              logger.info(existing);
+              if (existing == null) {
+                AppSettings global = new AppSettings(true, "global", cc);
+                global.setSettingsFile(itm.getValue(), allowUpdates, cc);
+                global.persist(cc);
+              } else {
+                existing.updateSettings(itm.getValue(), cc);
+                existing.persist(cc);
               }
-
-            }
-            global.persist(cc);
           }
         }
-
       } catch (ODKDatastoreException e){
         logger.error("Settings upload persistence error: " + e.toString());
         e.printStackTrace(resp.getWriter());

@@ -26,7 +26,8 @@ import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.ui.PopupPanel;
 
 public final class ServletPopupButton extends AggregateButton implements ClickHandler {
-  
+
+
   private final String url;
   private final String title;
   private final AggregateSubTabBase basePanel;

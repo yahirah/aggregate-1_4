@@ -35,6 +35,7 @@ public class SettingsSubTab extends  AggregateSubTabBase {
     // save the webform setting
     showEnketoIntegration = Preferences.showEnketoIntegration();
     // create settings list
+
     listOfSettings = new SettingsTable();
     listOfSettings.getElement().setId("settings_management_table");
 

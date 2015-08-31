@@ -28,13 +28,22 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
- * Created by Anna on 2015-08-23.
+ * The service class that allows for basic operations on app settings, like fetching single/all settings or deleting.
+ * The create/update functionality can be found at @see org.opendatakit.aggregate.settings.SettingsFactory .
+ * @author Anna
+ * @created 2015-08-23.
  */
 public class SettingsServiceImpl extends RemoteServiceServlet implements
     org.opendatakit.aggregate.client.settings.SettingsService {
 
   private static final Log logger = LogFactory.getLog(SettingsServiceImpl.class.getName());
 
+  /**
+   *
+   * @return list of app settings on the server (summaries)
+   * @throws AccessDeniedException
+   * @throws DatastoreFailureException
+   */
   public ArrayList<AppSettingsSummary> getSettings() throws AccessDeniedException, DatastoreFailureException {
 
     HttpServletRequest req = this.getThreadLocalRequest();
@@ -64,11 +73,18 @@ public class SettingsServiceImpl extends RemoteServiceServlet implements
       return settingsSummaries;
 
     } catch (ODKDatastoreException e) {
+      logger.error("Following error appeared while fetching settings:");
       e.printStackTrace();
       throw new DatastoreFailureException();
     }
   }
 
+  /**
+   *
+   * @param name of the settings
+   * @return list (or actually just one file)of summaries of the stored file for this settings
+   * @throws DatastoreFailureException
+   */
   public ArrayList<MediaFileSummary> getSettingsFileList(String name) throws DatastoreFailureException {
     HttpServletRequest req = this.getThreadLocalRequest();
     CallingContext cc = ContextFactory.getCallingContext(this, req);
@@ -102,6 +118,13 @@ public class SettingsServiceImpl extends RemoteServiceServlet implements
     return mediaSummaryList;
   }
 
+  /**
+   * Removes the settings from both database & cache.
+   * @param name of the settings
+   * @throws AccessDeniedException
+   * @throws DatastoreFailureException
+   * @throws RequestFailureException
+   */
   public void deleteSettings(String name)  throws AccessDeniedException,
       DatastoreFailureException, RequestFailureException    {
       HttpServletRequest req = this.getThreadLocalRequest();

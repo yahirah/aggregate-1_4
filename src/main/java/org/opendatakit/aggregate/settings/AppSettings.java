@@ -21,21 +21,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Anna on 2015-08-22.
+ * Helper class that wraps the concept of the app settings, storing both entity with settings description (@see
+ * #settingsRow) and file handler (@see #settings). Works as Data Access Object with CRUD functionalities.
+ * @author Anna
  */
 public class AppSettings {
   private static final Log logger = LogFactory.getLog(AppSettings.class.getName());
 
   private final AppSettingsFilesetTable settingsRow;
-
   private final BinaryContentManipulator settings;
 
+  /**
+   * Constructor used for internal purposes of fetching the data & wrapping it in this helper.
+   * @param tSettingsRow
+   * @param cc
+   * @throws ODKDatastoreException
+   */
   public AppSettings(AppSettingsFilesetTable tSettingsRow, CallingContext cc) throws ODKDatastoreException {
     this.settingsRow = tSettingsRow;
     String topLevelAuri = tSettingsRow.getUri();
     this.settings = AppSettingsFilesetTable.assertSettingsManipulator(topLevelAuri, settingsRow.getUri(), cc);
   }
 
+  /**
+   * Constructor used when creating new app settings from uploaded xml file.
+   * @param isDownloadEnabled
+   * @param settingsType
+   * @param cc
+   * @throws ODKDatastoreException
+   */
   public AppSettings(boolean isDownloadEnabled,String settingsType, CallingContext cc) throws ODKDatastoreException {
     Datastore ds = cc.getDatastore();
     User user = cc.getCurrentUser();
@@ -46,8 +60,8 @@ public class AppSettings {
       AppSettingsFilesetTable settingsRelation = AppSettingsFilesetTable.assertRelation(cc);
       settingsRow = ds.createEntityUsingRelation(settingsRelation, user);
       String primaryKey = CommonFieldsBase.newMD5HashUri(settingsType);
-      logger.warn("*********************");
-      logger.warn(settingsType + primaryKey);
+      logger.info("*********************");
+      logger.warn("Creating settings: " + settingsType + " with key: " + primaryKey);
       settingsRow.setStringField(settingsRow.primaryKey, primaryKey);
       settingsRow.setSubmissionDate(now);
       settingsRow.setMarkedAsCompleteDate(now);
@@ -56,25 +70,45 @@ public class AppSettings {
       settingsRow.setUiVersion(0L);    // rollback (v1.0.x) compatibility
       settingsRow.setBooleanField(AppSettingsFilesetTable.IS_DOWNLOAD_ALLOWED, isDownloadEnabled);
       settingsRow.setStringField(AppSettingsFilesetTable.SETTINGS_NAME, settingsType);
-      logger.warn("*********************");
-      logger.warn("imma creating record");
     }
 
     this.settings = AppSettingsFilesetTable.assertSettingsManipulator(settingsRow.getUri(),
         settingsRow.getUri(), cc);
   }
 
+  private boolean getDownloadEnabled() {
+    return settingsRow.getBooleanField(AppSettingsFilesetTable.IS_DOWNLOAD_ALLOWED);
+  }
+
+  public String getUri() { return settingsRow.getUri();  }
+
+  public Date getLastUpdateDate() { return settingsRow.getLastUpdateDate();}
+
+  private String getCreationUser() { return settingsRow.getCreatorUriUser(); }
+  public Date getCreationDate() { return settingsRow.getCreationDate(); }
+
+  public String getFileName() { return settingsRow.getStringField
+      (AppSettingsFilesetTable.SETTINGS_NAME); }
 
 
+  /**
+   * Operation of saving changes (create/update) in database.
+   * @param cc
+   * @throws ODKDatastoreException
+   */
   public synchronized void persist(CallingContext cc) throws ODKDatastoreException {
     Datastore ds = cc.getDatastore();
     User user = cc.getCurrentUser();
-
     ds.putEntity(settingsRow, user);
     settings.persist(cc);
 
   }
 
+  /**
+   * Deleting from database, both description and file.
+   * @param cc
+   * @throws ODKDatastoreException
+   */
   public synchronized void deleteSettings(CallingContext cc) throws ODKDatastoreException {
     SettingsFactory.clearSettings(this);
 
@@ -86,7 +120,12 @@ public class AppSettings {
     ds.deleteEntity(settingsRow.getEntityKey(), user);
   }
 
-
+  /**
+   * Checks, if there is any file connected to this settings.
+   * @param cc
+   * @return
+   * @throws ODKDatastoreException
+   */
   public boolean hasSettingsFileset(CallingContext cc) throws ODKDatastoreException {
     return settings.getAttachmentCount(cc) != 0;
   }
@@ -97,7 +136,7 @@ public class AppSettings {
 
 
   /**
-   * Media files are assumed to be in a directory one level deeper than the xml
+   * Files are assumed to be in a directory one level deeper than the xml
    * definition. So the filename reported on the mime item has an extra leading
    * directory. Strip that off.
    *
@@ -118,20 +157,14 @@ public class AppSettings {
         settings.setValueFromByteArray(byteArray, item.getContentType(), filePath, overwriteOK, cc);
     return (outcome == BinaryContentManipulator.BlobSubmissionOutcome.NEW_FILE_VERSION);
   }
-  private boolean getDownloadEnabled() {
-    return settingsRow.getBooleanField(AppSettingsFilesetTable.IS_DOWNLOAD_ALLOWED);
-  }
 
-  public String getUri() { return settingsRow.getUri();  }
-
-  public Date getLastUpdateDate() { return settingsRow.getLastUpdateDate();}
-
-  private String getCreationUser() { return settingsRow.getCreatorUriUser(); }
-  public Date getCreationDate() { return settingsRow.getCreationDate(); }
-
-  public String getFileName() { return settingsRow.getStringField
-      (AppSettingsFilesetTable.SETTINGS_NAME); }
-
+  /**
+   *
+   * @param cc
+   * @return summarison of this App Settings in form of @see org.opendatakit.aggregate.client.settings
+   * .AppSettingsSummary .
+   * @throws ODKDatastoreException
+   */
   public AppSettingsSummary generateSettingsSummary(CallingContext cc) throws ODKDatastoreException {
     boolean downloadable = getDownloadEnabled();
     Map<String, String> xmlProperties = new HashMap<String, String>();
@@ -145,7 +178,12 @@ public class AppSettings {
         downloadable, viewableURL, mediaFileCount);
   }
 
-
+  /**
+   *
+   * @param cc
+   * @return xml of the settings file as String
+   * @throws ODKDatastoreException
+   */
   public String getSettingsXml(CallingContext cc) throws ODKDatastoreException {
     if (settings.getAttachmentCount(cc) == 1) {
       if (settings.getContentHash(1, cc) == null) {
@@ -162,5 +200,19 @@ public class AppSettings {
       throw new IllegalStateException("Expecting only one fileset record at this time!");
     }
     return null;
+  }
+
+  /**
+   * Settings flags & data to prepare the record to be updated
+   * @param value - new settings file
+   * @param cc
+   * @throws ODKDatastoreException
+   */
+  public void updateSettings(MultiPartFormItem value, CallingContext cc) throws ODKDatastoreException {
+    Date now = new Date();
+    settingsRow.setFromDatabase(true);
+    settingsRow.setSubmissionDate(now);
+    setSettingsFile(value, true, cc);
+
   }
 }
