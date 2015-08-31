@@ -11,12 +11,9 @@ import org.opendatakit.common.security.client.exception.AccessDeniedException;
 import java.util.ArrayList;
 
 /**
- * Created by Anna on 2015-08-23.
- */
-/**
+ * @author Anna
  * These are the APIs available to users with the ROLE_DATA_OWNER privilege.
- * Adding settings, settings forms, and other forms settings are here.
- *
+ * Delete & get settings functionality here. For internal use (client <-> server).
  *
  */
 @RemoteServiceRelativePath("settingsservice")

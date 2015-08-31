@@ -7,7 +7,8 @@ import org.opendatakit.aggregate.client.popups.ConfirmSettingsDeletePopup;
 import org.opendatakit.common.security.common.GrantedAuthorityName;
 
 /**
- * Created by Anna on 2015-08-24.
+ * @author Anna
+ * Small button for UI for deleting the app settings.
  */
 public final class DeleteSettingsButton extends AggregateButton implements ClickHandler {
 

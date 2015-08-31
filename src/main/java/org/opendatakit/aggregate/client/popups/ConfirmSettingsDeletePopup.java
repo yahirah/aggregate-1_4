@@ -13,7 +13,8 @@ import org.opendatakit.aggregate.client.widgets.ClosePopupButton;
 import org.opendatakit.aggregate.constants.common.SubTabs;
 
 /**
- * Created by Anna on 2015-08-24.
+ * @author Anna
+ * Popup responsible for handling the action of settings delete.
  */
 public final class ConfirmSettingsDeletePopup extends AbstractPopupBase  {
   

@@ -10,7 +10,9 @@ import org.opendatakit.aggregate.constants.common.UIConsts;
 import java.util.ArrayList;
 
 /**
- * Created by Anna on 2015-08-22.
+ * A tab for managing the app settings (create, update and delete, no editing possible for now).
+ * Updating is made by submitting new one with the same name.
+ * @author Anna
  */
 public class SettingsSubTab extends  AggregateSubTabBase {
 

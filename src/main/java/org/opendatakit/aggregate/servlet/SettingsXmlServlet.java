@@ -21,7 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Anna on 2015-08-25.
+ * Servlet that generates human readable (or not, depending on parameters) xml of settings based on given settings
+ * name.
+ * @author Anna
  */
 public class SettingsXmlServlet extends ServletUtilBase {
 

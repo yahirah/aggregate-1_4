@@ -10,7 +10,8 @@ import org.opendatakit.aggregate.client.widgets.ClosePopupButton;
 import java.util.ArrayList;
 
 /**
- * Created by Anna on 2015-08-23.
+ * @author Anna
+ * Popup displaying file name & other properties of the settings file.
  */
 public class SettingsFileListPopup extends AbstractPopupBase{
 

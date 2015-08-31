@@ -15,7 +15,8 @@ import org.opendatakit.common.security.client.UserSecurityInfo;
 import java.util.ArrayList;
 
 /**
- * Created by Anna on 2015-08-23.
+ * @author Anna
+ * Table used for displaying app settings rows.
  */
 public class SettingsTable extends FlexTable {
 

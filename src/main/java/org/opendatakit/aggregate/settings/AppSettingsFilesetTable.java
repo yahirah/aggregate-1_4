@@ -14,7 +14,9 @@ import org.opendatakit.common.security.User;
 import org.opendatakit.common.web.CallingContext;
 
 /**
- * Created by Anna on 2015-08-22.
+ * Entity that consist of 4 tables - main, for settings description and 3 helpers for storring the xml file (_blb,
+ * _bin, _ref). The primary key is a hash of a settings name.
+ * @author Anna
  */
 public class AppSettingsFilesetTable extends TopLevelDynamicBase {
   static final String TABLE_NAME = "_app_settings";
@@ -62,7 +64,9 @@ public class AppSettingsFilesetTable extends TopLevelDynamicBase {
   private static BinaryContentRefBlob settingsBinaryRefBlobRelation = null;
   private static RefBlob settingsRefBlobRelation = null;
 
-
+  /**
+  * Creates the table if it not yet existed in database.
+  */
   static synchronized final AppSettingsFilesetTable assertRelation(CallingContext cc) throws ODKDatastoreException {
     if ( relation == null ) {
       AppSettingsFilesetTable relationPrototype;

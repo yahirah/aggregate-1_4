@@ -60,7 +60,6 @@ public class AppSettings {
       AppSettingsFilesetTable settingsRelation = AppSettingsFilesetTable.assertRelation(cc);
       settingsRow = ds.createEntityUsingRelation(settingsRelation, user);
       String primaryKey = CommonFieldsBase.newMD5HashUri(settingsType);
-      logger.info("*********************");
       logger.warn("Creating settings: " + settingsType + " with key: " + primaryKey);
       settingsRow.setStringField(settingsRow.primaryKey, primaryKey);
       settingsRow.setSubmissionDate(now);

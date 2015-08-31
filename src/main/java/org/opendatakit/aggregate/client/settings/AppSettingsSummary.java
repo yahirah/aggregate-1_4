@@ -4,7 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by Anna on 2015-08-23.
+ * @author Anna
+ * Helper class, used for storing information about app settings on client side - mostly for displaying purposes.
  */
 public class AppSettingsSummary implements Serializable {
 
