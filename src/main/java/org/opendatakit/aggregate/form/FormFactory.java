@@ -16,15 +16,6 @@
 
 package org.opendatakit.aggregate.form;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opendatakit.aggregate.exception.ODKConversionException;
@@ -40,7 +31,12 @@ import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.persistence.exception.ODKEntityNotFoundException;
 import org.opendatakit.common.persistence.exception.ODKOverQuotaException;
 import org.opendatakit.common.security.User;
+import org.opendatakit.common.security.UserService;
 import org.opendatakit.common.web.CallingContext;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
+
+import java.util.*;
 
 /**
  * Factory class for managing Form objects.
@@ -70,6 +66,8 @@ public class FormFactory {
    * @throws ODKOverQuotaException
    * @throws ODKDatastoreException
    */
+
+  @PostFilter("hasRole('ROLE_ADMIN')")
   private static synchronized final List<IForm> internalGetForms(String topLevelAuri, CallingContext cc)
       throws ODKOverQuotaException, ODKDatastoreException {
 
@@ -178,8 +176,11 @@ public class FormFactory {
     return f;
   }
 
+
   public static final List<IForm> getForms(boolean checkAuthorization, CallingContext cc)
       throws ODKOverQuotaException, ODKDatastoreException {
+    logger.debug("We're debugging now2 --------------------------------------------------");
+    logger.info("We're debugging now2 --------------------------------------------------");
     List<IForm> forms = internalGetForms(null, cc);
     // TODO: check authorization
     return forms;
@@ -227,6 +228,8 @@ public class FormFactory {
    *           Thrown when a form was not able to be found with the
    *           corresponding ODK ID
    */
+
+  @PostAuthorize("hasPermission(returnObject, 'READ')")
   public static IForm retrieveFormByFormId(String formId, CallingContext cc)
       throws ODKFormNotFoundException, ODKOverQuotaException, ODKDatastoreException {
 
