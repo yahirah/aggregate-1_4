@@ -60,6 +60,7 @@ class Form implements IForm {
    * getFormDefinition()
    */
 
+
   private final FormInfoTable infoRow;
 
   private final FormInfoFilesetTable filesetRow;
@@ -304,6 +305,10 @@ class Form implements IForm {
    */
   public String getFormId() {
     return infoRow.getStringField(FormInfoTable.FORM_ID);
+  }
+
+  public Long getId() {
+    return infoRow.getLongField(FormInfoTable.ACL_ID);
   }
 
   public boolean hasManifestFileset(CallingContext cc) throws ODKDatastoreException {

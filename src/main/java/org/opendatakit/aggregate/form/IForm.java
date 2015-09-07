@@ -93,6 +93,12 @@ public interface IForm {
    */
   public String getFormId();
 
+  /**
+   * Identifier for acl purpose
+   * @return acl identifier
+   */
+  public Long getId();
+
   public boolean hasManifestFileset(CallingContext cc) throws ODKDatastoreException;
 
   public BinaryContentManipulator getManifestFileset();

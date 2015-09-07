@@ -35,6 +35,9 @@ public class FormInfoTable extends TopLevelDynamicBase {
 	public static final DataField FORM_ID = new DataField("FORM_ID",
 			DataField.DataType.STRING, true, IForm.MAX_FORM_ID_LENGTH);
 
+	public static final DataField ACL_ID = new DataField("ACL_ID",
+			DataField.DataType.INTEGER, false, 1, 32);
+
 	/**
 	 * Construct a relation prototype.
 	 * 
@@ -43,6 +46,7 @@ public class FormInfoTable extends TopLevelDynamicBase {
 	private FormInfoTable(String databaseSchema) {
 		super(databaseSchema, TABLE_NAME);
 		fieldList.add(FORM_ID);
+		fieldList.add(ACL_ID);
 
 		fieldValueMap.put(primaryKey, CommonFieldsBase.newMD5HashUri(FormInfo.FORM_ID));
 		fieldValueMap.put(FORM_ID, FormInfo.FORM_ID);

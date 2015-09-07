@@ -683,6 +683,11 @@
 			<version>${org.springframework.security.version}</version>
 		</dependency>
 		<dependency>
+     		<groupId>org.springframework.security</groupId>
+     		<artifactId>spring-security-acl</artifactId>
+			<version>${org.springframework.security.version}</version>
+     	</dependency>
+		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>transaction-api</artifactId>
 			<version>1.1</version>
@@ -1149,7 +1154,7 @@
 					  </goals>
 					</execution>
 				  </executions>
-				</plugin><!--
+				</plugin> <!--
 				 <plugin>
 					<artifactId>maven-failsafe-plugin</artifactId>
 					<version>${maven.failsafe.plugin.version}</version>
@@ -1228,10 +1233,10 @@
 						</goals>
 					  </execution>
 					</executions>
-				</plugin> -->
+				</plugin> 
 				<plugin>
-					<!-- This configures an embedded Tomcat server to run the 
-						 manager app for integration testing. -->
+					<!- This configures an embedded Tomcat server to run the 
+						 manager app for integration testing. -
 					<groupId>org.codehaus.cargo</groupId>
 					<artifactId>cargo-maven2-plugin</artifactId>
 					<version>${cargo.maven2.plugin.version}</version>
@@ -1293,8 +1298,8 @@
 					</executions>
 				</plugin>
 				<plugin>
-					<!-- This configures the Selenium RC server to run for integration
-						 testing. -->
+					<!- This configures the Selenium RC server to run for integration
+						 testing. -
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>selenium-maven-plugin</artifactId>
 					<version>2.3</version>
@@ -1318,6 +1323,7 @@
 					  </execution>
 					</executions>
 				</plugin>
+				-->
 				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
