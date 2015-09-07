@@ -198,7 +198,7 @@ public class RoleHierarchyImpl implements RoleHierarchy, InitializingBean {
 		
 		Datastore ds = bootstrapCc.getDatastore();
 		User user = bootstrapCc.getCurrentUser();
-		
+
 		// gain single-access lock record in database...
 		String lockedResourceName = "---startup-serialization-lock---";
 		String startupLockId = UUID.randomUUID().toString();
@@ -241,7 +241,9 @@ public class RoleHierarchyImpl implements RoleHierarchy, InitializingBean {
 	
 			// ensure that the superuser has admin privileges
 			SecurityServiceUtil.superUserBootstrap(bootstrapCc);
-	
+
+			//TODO here implement stuff you want to generate during startup
+
 			refreshReachableGrantedAuthorities();
 			
 			if ( startupAction != null ) {

@@ -40,6 +40,7 @@ import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.persistence.exception.ODKEntityNotFoundException;
 import org.opendatakit.common.persistence.exception.ODKOverQuotaException;
 import org.opendatakit.common.security.User;
+import org.opendatakit.common.security.spring.AclTable;
 import org.opendatakit.common.web.CallingContext;
 
 /**
@@ -141,9 +142,32 @@ public class FormFactory {
       BackendActionsTable.triggerWatchdog(cc);
     }
 
+    Datastore ds = cc.getDatastore();
+    User user = cc.getCurrentUser();
+
+    AclTable relation = AclTable.assertRelation(ds, user);
+    Query entryQuery = ds.createQuery(relation, "Form.getFormsEntry", user);
+    entryQuery.addFilter(AclTable.SID, Query.FilterOperation.EQUAL, user.getId());
+    entryQuery.addFilter(AclTable.OBJECT_CLASS, Query.FilterOperation.EQUAL, AclTable.ProtectedClasses.FORM.getType());
+    entryQuery.addFilter(AclTable.GRANTED, Query.FilterOperation.EQUAL, true);
+    List<AclTable> entryRows = (List<AclTable>) entryQuery.executeQuery();
+    logger.debug("Appling object-based access protection.----------------- ");
+    logger.debug(entryRows.size());
+    logger.debug(user.getId());
     for (IForm v : cache) {
       if ( topLevelAuri == null || v.getUri().equals(topLevelAuri) ) {
-        forms.add(v);
+        Long main_id = v.getId();
+        for (AclTable entry : entryRows) {
+          Long entryId = entry.getLongField(AclTable.OBJECT_IDENTITY);
+          logger.debug("Appling object-based access protection. ");
+          logger.debug(main_id);
+          logger.debug(entryId);
+          if (main_id == entryId) {
+            logger.debug("Check succesful!");
+            forms.add(v);
+            break;
+          }
+        }
       }
     }
     return forms;

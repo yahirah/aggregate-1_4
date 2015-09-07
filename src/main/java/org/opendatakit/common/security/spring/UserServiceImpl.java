@@ -248,7 +248,7 @@ public class UserServiceImpl implements org.opendatakit.common.security.UserServ
       // ignored passed-in authorities
       Set<GrantedAuthority> anonGroups = new HashSet<GrantedAuthority>();
       anonGroups.add(new SimpleGrantedAuthority(GrantedAuthorityName.USER_IS_ANONYMOUS.name()));
-      match = new UserImpl(User.ANONYMOUS_USER, null, User.ANONYMOUS_USER_NICKNAME, anonGroups,
+      match = new UserImpl(User.ANONYMOUS_USER, null, User.ANONYMOUS_USER_NICKNAME, User.ANONYMOUS_USER_ID, anonGroups,
           datastore);
       activeUsers.put(uriUser, match);
       return match;
@@ -257,7 +257,7 @@ public class UserServiceImpl implements org.opendatakit.common.security.UserServ
       Set<GrantedAuthority> daemonGroups = new HashSet<GrantedAuthority>();
       daemonGroups = new HashSet<GrantedAuthority>();
       daemonGroups.add(new SimpleGrantedAuthority(GrantedAuthorityName.USER_IS_DAEMON.name()));
-      match = new UserImpl(User.DAEMON_USER, null, User.DAEMON_USER_NICKNAME, daemonGroups,
+      match = new UserImpl(User.DAEMON_USER, null, User.DAEMON_USER_NICKNAME, User.DAEMON_USER_ID, daemonGroups,
           datastore);
       activeUsers.put(uriUser, match);
       return match;
@@ -265,16 +265,15 @@ public class UserServiceImpl implements org.opendatakit.common.security.UserServ
       try {
         RegisteredUsersTable t = RegisteredUsersTable.getUserByUri(uriUser, datastore,
             getDaemonAccountUser());
-        match = new UserImpl(uriUser, getEmail(uriUser, t.getEmail()), t.getDisplayName(),
+        match = new UserImpl(uriUser, getEmail(uriUser, t.getEmail()), t.getDisplayName(), t.getId(),
             authorities, datastore);
       } catch (ODKEntityNotFoundException e) {
-        match = new UserImpl(uriUser, getEmail(uriUser, null), getNickname(uriUser), authorities,
+        logger.debug("The user was not found");
+        match = new UserImpl(uriUser, getEmail(uriUser, null), getNickname(uriUser), 0L, authorities,
             datastore);
       } catch (ODKDatastoreException e) {
         e.printStackTrace();
         // best guess...
-        match = new UserImpl(uriUser, getEmail(uriUser, null), getNickname(uriUser), authorities,
-            datastore);
       }
       activeUsers.put(uriUser, match);
       return match;

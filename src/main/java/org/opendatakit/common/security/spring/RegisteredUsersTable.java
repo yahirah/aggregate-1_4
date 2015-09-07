@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opendatakit.aggregate.client.permissions.CredentialsInfoBuilder;
+import org.opendatakit.aggregate.form.FormInfoTable;
 import org.opendatakit.aggregate.server.ServerPreferencesProperties;
 import org.opendatakit.common.persistence.CommonFieldsBase;
 import org.opendatakit.common.persistence.DataField;
@@ -110,6 +111,9 @@ public final class RegisteredUsersTable extends CommonFieldsBase {
   private static final DataField IS_REMOVED = new DataField("IS_REMOVED",
       DataField.DataType.BOOLEAN, false);
 
+  public static final DataField ACL_ID = new DataField("ACL_ID",
+      DataField.DataType.INTEGER, false, 1, 32);
+
   /**
    * Construct a relation prototype. Only called via
    * {@link #assertRelation(Datastore, User)}
@@ -125,6 +129,7 @@ public final class RegisteredUsersTable extends CommonFieldsBase {
     fieldList.add(BASIC_AUTH_SALT);
     fieldList.add(DIGEST_AUTH_PASSWORD);
     fieldList.add(IS_REMOVED);
+    fieldList.add(ACL_ID);
   }
 
   /**
@@ -227,6 +232,7 @@ public final class RegisteredUsersTable extends CommonFieldsBase {
     }
   }
 
+  public Long getId() { return getLongField(ACL_ID);  }
   public Boolean getIsRemoved() {
     return getBooleanField(IS_REMOVED);
   }

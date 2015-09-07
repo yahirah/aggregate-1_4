@@ -15,9 +15,9 @@
  */
 package org.opendatakit.common.security;
 
-import java.util.Set;
-
 import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Set;
 
 
 /**
@@ -32,9 +32,18 @@ import org.springframework.security.core.GrantedAuthority;
 public interface User {
 	public static final String ANONYMOUS_USER = "anonymousUser";
 	public static final String ANONYMOUS_USER_NICKNAME = "Anonymous Access";
+	public static final Long ANONYMOUS_USER_ID = 0L;
 
 	public static final String DAEMON_USER = "aggregate.opendatakit.org:web-service";
 	public static final String DAEMON_USER_NICKNAME = "Background Task Account";
+	public static final Long DAEMON_USER_ID = 1L;
+
+
+	/**
+	 * @return global user id.
+	 */
+	public Long getId();
+
 	/**
 	 * @return User-friendly name.
 	 */

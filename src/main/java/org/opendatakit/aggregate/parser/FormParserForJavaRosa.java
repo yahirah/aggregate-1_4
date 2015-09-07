@@ -472,6 +472,7 @@ public class FormParserForJavaRosa extends BaseFormParserForJavaRosa {
     // Determine the information about the submission...
     formInfo.setIsComplete(true);
     formInfo.persist(cc);
+    formInfo.setAccessEntry(cc);
 
     Datastore ds = cc.getDatastore();
     User user = cc.getCurrentUser();

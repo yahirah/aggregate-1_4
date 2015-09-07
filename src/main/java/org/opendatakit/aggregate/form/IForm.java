@@ -278,4 +278,5 @@ public interface IForm {
   public String getUri();
 
 
+  void setAccessEntry(CallingContext cc) throws ODKDatastoreException;
 }

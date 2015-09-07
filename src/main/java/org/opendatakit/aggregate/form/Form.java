@@ -37,11 +37,13 @@ import org.opendatakit.common.persistence.Query;
 import org.opendatakit.common.persistence.Query.FilterOperation;
 import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.security.User;
+import org.opendatakit.common.security.spring.AclTable;
 import org.opendatakit.common.web.CallingContext;
 import org.opendatakit.common.web.constants.BasicConsts;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.security.acl.Acl;
 import java.util.*;
 
 /**
@@ -72,6 +74,7 @@ class Form implements IForm {
   private final BinaryContentManipulator settings;
 
   private final FormSettingsFileTable settingsRow;
+
 
   /**
    * Definition of the database representation of the form submission.
@@ -132,6 +135,10 @@ class Form implements IForm {
       }
     }
 
+
+
+
+
     this.xform = FormInfoFilesetTable.assertXformManipulator(topLevelAuri, filesetRow.getUri(), cc);
 
     this.manifest = FormInfoFilesetTable.assertManifestManipulator(topLevelAuri,
@@ -190,6 +197,7 @@ class Form implements IForm {
       settingsRow.setStringField(FormSettingsFileTable.FORM_NAME, title);
       settingsRow.setStringField(FormSettingsFileTable.FORM_ID, rootElementDefn.formId);
 
+
     }
 
     this.xform = FormInfoFilesetTable.assertXformManipulator(topLevelAuri, filesetRow.getUri(), cc);
@@ -215,12 +223,39 @@ class Form implements IForm {
     ds.putEntity(infoRow, user);
     ds.putEntity(filesetRow, user);
     ds.putEntity(settingsRow, user);
+
     manifest.persist(cc);
     xform.persist(cc);
     settings.persist(cc);
 
     if (formDefinition != null) {
       formDefinition.persistSubmissionAssociation(cc);
+    }
+  }
+
+  public synchronized void setAccessEntry(CallingContext cc) throws ODKDatastoreException {
+    Datastore ds = cc.getDatastore();
+    User user = cc.getCurrentUser();
+
+    FormInfoTable infoRelation = FormInfoTable.assertRelation(cc);
+    Query q = ds.createQuery(infoRelation, "Form.updatingInfoRow", user);
+    q.addFilter(infoRow.FORM_ID, FilterOperation.EQUAL, getFormId());
+    List<? extends CommonFieldsBase > rows = q.executeQuery();
+    infoRow.setLongField(FormInfoTable.ACL_ID, rows.get(0).getLongField(FormInfoTable.ACL_ID));
+
+
+    logger.debug("Id of form is -------------------- " + getId().toString());
+    AclTable entryRelation = AclTable.assertRelation(ds, user);
+    AclTable entryOwnerRow = ds.createEntityUsingRelation(entryRelation, user);
+    entryOwnerRow.setStringField(AclTable.OBJECT_CLASS, AclTable.ProtectedClasses.FORM.getType());
+    entryOwnerRow.setLongField(AclTable.OBJECT_IDENTITY, getId());
+    entryOwnerRow.setLongField(AclTable.SID, user.getId());
+    entryOwnerRow.setBooleanField(AclTable.GRANTED, true);
+    ds.putEntity(entryOwnerRow, user);
+    logger.info("Generating owner rights to form " + getId().toString() + " for " + user.getNickname());
+    if(user.getId() != AclTable.DEFAULT_ID) {
+      AclTable.addAdminAccess(getId(), cc);
+      logger.info("Generating user rights to form " + getId().toString() + " for admin");
     }
   }
 
@@ -247,6 +282,8 @@ class Form implements IForm {
     manifest.deleteAll(cc);
     xform.deleteAll(cc);
     settings.deleteAll(cc);
+
+    AclTable.deleteEntriesFor(getId(), cc);
     ds.deleteEntity(filesetRow.getEntityKey(), user);
     ds.deleteEntity(infoRow.getEntityKey(), user);
     ds.deleteEntity(settingsRow.getEntityKey(), user);
@@ -620,8 +657,8 @@ class Form implements IForm {
 
     String viewableURL = HtmlUtil.createHrefWithProperties(
         cc.getWebApplicationURL(FormXmlServlet.WWW_ADDR), xmlProperties, getViewableName(), false);
-    logger.warn("**************************");
-    logger.warn("File set number: " + getSettingsFileset().getAttachmentCount(cc));
+    logger.debug("**************************");
+    logger.debug("File set number: " + getSettingsFileset().getAttachmentCount(cc));
     int mediaFileCount = getManifestFileset().getAttachmentCount(cc) + getSettingsFileset().getAttachmentCount(cc);
     return new FormSummary(getViewableName(), getFormId(), getCreationDate(), getCreationUser(),
         downloadable, submit, viewableURL, mediaFileCount);
@@ -789,6 +826,8 @@ class Form implements IForm {
   public String getUri() {
     return infoRow.getUri();
   }
+
+
 
 
 }
