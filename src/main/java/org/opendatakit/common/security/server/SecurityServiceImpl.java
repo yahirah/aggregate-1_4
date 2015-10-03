@@ -16,25 +16,33 @@
 
 package org.opendatakit.common.security.server;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opendatakit.aggregate.ContextFactory;
+import org.opendatakit.aggregate.constants.ErrorConsts;
+import org.opendatakit.aggregate.server.SettingsServiceImpl;
 import org.opendatakit.aggregate.servlet.UserManagePasswordsServlet;
+import org.opendatakit.common.persistence.CommonFieldsBase;
 import org.opendatakit.common.persistence.Datastore;
 import org.opendatakit.common.persistence.client.exception.DatastoreFailureException;
 import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.security.SecurityBeanDefs;
 import org.opendatakit.common.security.User;
+import org.opendatakit.common.security.client.CredentialsInfo;
 import org.opendatakit.common.security.client.RealmSecurityInfo;
 import org.opendatakit.common.security.client.UserSecurityInfo;
 import org.opendatakit.common.security.client.exception.AccessDeniedException;
 import org.opendatakit.common.security.common.GrantedAuthorityName;
+import org.opendatakit.common.security.spring.AclTable;
 import org.opendatakit.common.security.spring.RegisteredUsersTable;
 import org.opendatakit.common.web.CallingContext;
 import org.opendatakit.common.web.constants.BasicConsts;
 import org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * GWT Server implementation for the SecurityService interface. This provides
@@ -51,6 +59,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements
 	 * 
 	 */
   private static final long serialVersionUID = -7360632450727200941L;
+  private static final Log logger = LogFactory.getLog(SecurityServiceImpl.class.getName());
 
   @Override
   public UserSecurityInfo getUserInfo() throws AccessDeniedException, DatastoreFailureException {
@@ -117,5 +126,57 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements
     r.setChangeUserPasswordURL(cc.getSecureServerURL() + BasicConsts.FORWARDSLASH
         + UserManagePasswordsServlet.ADDR);
     return r;
+  }
+
+  @Override
+  public Integer changePasswords(List<CredentialsInfo> users) {
+    HttpServletRequest req = this.getThreadLocalRequest();
+    CallingContext cc = ContextFactory.getCallingContext(this, req);
+    Integer outcome = 0;
+    logger.debug("So many users to change: " + users.size());
+    for(CredentialsInfo credential : users) {
+      try {
+      SecurityServiceUtil.setUserCredentials(credential, cc);
+
+      String superUsername = cc.getUserService().getSuperUserUsername();
+      if ( superUsername.equals(credential.getUsername()) ) {
+        cc.getUserService().reloadPermissions();
+      }
+      outcome++;
+      } catch (AccessDeniedException e1) {
+        logger.warn("Bad username: " + credential.getUsername() + "with problem" + e1.getMessage());
+      } catch (DatastoreFailureException e1) {
+        logger.warn(ErrorConsts.PERSISTENCE_LAYER_PROBLEM);
+      }
+    }
+    return outcome;
+  }
+
+  public void assignUsersToForm(List<String> usernames, String formId) {
+    logger.warn("Assigng users to form");
+    HttpServletRequest req = this.getThreadLocalRequest();
+    CallingContext cc = ContextFactory.getCallingContext(this, req);
+    Datastore ds = cc.getDatastore();
+    logger.warn("Assigning " + usernames.size() + " users to " + formId);
+    List<Long> ids = new ArrayList<Long>();
+    try {
+      for(String username : usernames) {
+        RegisteredUsersTable userDefinition = RegisteredUsersTable.getUserByUsername(username,
+            cc.getUserService(), ds);
+        if (userDefinition == null) {
+          throw new AccessDeniedException("User is not a registered user.");
+        }
+        ids.add(userDefinition.getId());
+
+      }
+      SecurityServiceUtil.assignUserToForm(ids, formId, cc);
+    } catch (ODKDatastoreException e) {
+      logger.warn("Error with database while adding access to " + formId);
+      e.printStackTrace();
+    } catch (AccessDeniedException e) {
+      logger.warn("Access denied while adding access to " + formId);
+      e.printStackTrace();
+    }
+    logger.info("Generating access rights to form " + formId.toString() + " for " + usernames.size() + " users");
   }
 }

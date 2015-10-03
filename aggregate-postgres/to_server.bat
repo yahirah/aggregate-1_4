@@ -1,0 +1,1 @@
+"D:\My Downloads\pscp.exe"  "E:\Projekty\Studia\aggregate-1_4\aggregate-postgres\target\aggregate-postgres-1.0.1.war" s121540@smart-data-collection.compute.dtu.dk:aggregate.war

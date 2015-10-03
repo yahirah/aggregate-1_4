@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by Anna on 2015-08-22.
+ * Servlet for uploading App Settings. Mostly for internal use.
+ * @author Anna
  */
 public class SettingsUploadServlet extends ServletUtilBase {
 

@@ -40,10 +40,7 @@ import org.opendatakit.common.security.client.UserSecurityInfo.UserType;
 import org.opendatakit.common.security.client.exception.AccessDeniedException;
 import org.opendatakit.common.security.common.EmailParser;
 import org.opendatakit.common.security.common.GrantedAuthorityName;
-import org.opendatakit.common.security.spring.GrantedAuthorityHierarchyTable;
-import org.opendatakit.common.security.spring.RegisteredUsersTable;
-import org.opendatakit.common.security.spring.SecurityRevisionsTable;
-import org.opendatakit.common.security.spring.UserGrantedAuthority;
+import org.opendatakit.common.security.spring.*;
 import org.opendatakit.common.web.CallingContext;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder;
@@ -690,4 +687,21 @@ public class SecurityServiceUtil {
         GrantedAuthorityName.ROLE_SITE_ACCESS_ADMIN.name()), uriUsers, cc);
   }
 
+  public static void assignUserToForm(List<Long> ids, String formId, CallingContext cc) throws ODKDatastoreException {
+    Datastore ds = cc.getDatastore();
+    User user = cc.getCurrentUser();
+    RegisteredUsersTable userDefinition = null;
+    List<CommonFieldsBase> newEntries = new ArrayList<CommonFieldsBase>();
+    AclTable entryRelation = null;
+    entryRelation = AclTable.assertRelation(ds, user);
+    for(Long id: ids) {
+      AclTable entryAccessRow = ds.createEntityUsingRelation(entryRelation, user);
+      entryAccessRow.setStringField(AclTable.OBJECT_CLASS, AclTable.ProtectedClasses.FORM.getType());
+      entryAccessRow.setLongField(AclTable.OBJECT_IDENTITY, Long.valueOf(formId));
+      entryAccessRow.setLongField(AclTable.SID, id);
+      entryAccessRow.setBooleanField(AclTable.GRANTED, true);
+      newEntries.add(entryAccessRow);
+    }
+    ds.putEntities(newEntries, user);
+  }
 }

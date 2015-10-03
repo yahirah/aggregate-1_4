@@ -16,13 +16,15 @@
 
 package org.opendatakit.common.security.client.security;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import org.opendatakit.common.persistence.client.exception.DatastoreFailureException;
+import org.opendatakit.common.security.client.CredentialsInfo;
 import org.opendatakit.common.security.client.RealmSecurityInfo;
 import org.opendatakit.common.security.client.UserSecurityInfo;
 import org.opendatakit.common.security.client.exception.AccessDeniedException;
 
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import java.util.List;
 
 /**
  * These are the APIs available to users with the ROLE_USER privilege.
@@ -49,4 +51,9 @@ public interface SecurityService extends RemoteService {
 	 * @throws DatastoreFailureException 
 	 */
 	RealmSecurityInfo getRealmInfo(String xsrfString) throws AccessDeniedException, DatastoreFailureException;
+
+
+	Integer changePasswords(List<CredentialsInfo> users);
+
+	void assignUsersToForm(List<String> usernames, String formId);
 }

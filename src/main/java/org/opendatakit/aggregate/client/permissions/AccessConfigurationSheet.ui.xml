@@ -35,9 +35,17 @@ retrieval of images, audio and video data (needed for GoogleEarth balloon displa
 list of users in the above table. Iteractive logins with Google accounts are no longer supported.</p>
 <g:TextArea visibleLines="3" characterWidth="80" ui:field="addedUsers" />
 <br/>
-<g:Button styleName="gwt-Button" ui:field="addNow" text="Add"/>
+<g:Button styleName="gwt-Button" ui:field="addNow" text="Add just users"/>
 <br/>
 <hr/>
+ <h3>Add Users with Passwords as Data Collector</h3>
+ Pick form, to which you want to assign the users:
+ <g:ListBox styleName="gwt-ListBox" ui:field="forms" />
+ <br />
+ Please, add users in csv format (name,password) with each user in new line.
+ <g:TextArea visibleLines="3" characterWidth="80" ui:field="addedUsersWithPass" />
+ <br/>
+ <g:Button styleName="gwt-Button" ui:field="addUsers" text="Add users, passwords to forms"/>
 <br/>
 </g:HTMLPanel>
 </ui:UiBinder>

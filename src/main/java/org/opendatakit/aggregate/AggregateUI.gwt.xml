@@ -5,7 +5,6 @@
 
   <!-- Inherit the core Web Toolkit stuff.                        -->
   <inherits name='com.google.gwt.user.User'/>
-
   <inherits name='com.google.gwt.user.theme.standard.StandardResources'/>
   <!-- include JSON and HTTP RequestBuilder (for changing passwords) -->
   <inherits name="com.google.gwt.json.JSON" />
@@ -13,6 +12,7 @@
   <inherits name='com.google.gwt.maps.Maps' />
   <!--  v2 <inherits name='com.google.gwt.maps.GoogleMaps' />  -->  
   <inherits name='com.google.gwt.visualization.Visualization'/>
+  <inherits name="com.google.gwt.logging.Logging"/>
   <!-- Generic extended widget classes -->
   <inherits name='org.opendatakit.common.web.Web'/>
   

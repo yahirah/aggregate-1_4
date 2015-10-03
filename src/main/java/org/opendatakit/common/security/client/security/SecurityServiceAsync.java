@@ -16,10 +16,12 @@
 
 package org.opendatakit.common.security.client.security;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.opendatakit.common.security.client.CredentialsInfo;
 import org.opendatakit.common.security.client.RealmSecurityInfo;
 import org.opendatakit.common.security.client.UserSecurityInfo;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import java.util.List;
 
 public interface SecurityServiceAsync {
 
@@ -27,4 +29,8 @@ public interface SecurityServiceAsync {
 
 	void getRealmInfo(String xsrfString,
 			AsyncCallback<RealmSecurityInfo> callback);
+
+	void changePasswords(List<CredentialsInfo> users, AsyncCallback<Integer> successes);
+
+	void assignUsersToForm(List<String> usernames, String formId, AsyncCallback<Void> callback);
 }

@@ -151,17 +151,13 @@ public class FormFactory {
     entryQuery.addFilter(AclTable.OBJECT_CLASS, Query.FilterOperation.EQUAL, AclTable.ProtectedClasses.FORM.getType());
     entryQuery.addFilter(AclTable.GRANTED, Query.FilterOperation.EQUAL, true);
     List<AclTable> entryRows = (List<AclTable>) entryQuery.executeQuery();
-    logger.debug("Appling object-based access protection.----------------- ");
-    logger.debug(entryRows.size());
-    logger.debug(user.getId());
+
+    logger.debug("Appling object-based access protection.");
     for (IForm v : cache) {
       if ( topLevelAuri == null || v.getUri().equals(topLevelAuri) ) {
         Long main_id = v.getId();
         for (AclTable entry : entryRows) {
           Long entryId = entry.getLongField(AclTable.OBJECT_IDENTITY);
-          logger.debug("Appling object-based access protection. ");
-          logger.debug(main_id);
-          logger.debug(entryId);
           if (main_id == entryId) {
             logger.debug("Check succesful!");
             forms.add(v);

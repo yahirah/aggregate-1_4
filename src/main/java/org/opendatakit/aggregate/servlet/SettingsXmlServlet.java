@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Servlet that generates human readable (or not, depending on parameters) xml of settings based on given settings
+ * Servlet that generates human readable (or not, depending on parameters) xml of app settings based on given settings
  * name.
  * @author Anna
  */

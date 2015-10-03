@@ -15,15 +15,9 @@
  */
 package org.opendatakit.common.security.spring;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opendatakit.aggregate.client.permissions.CredentialsInfoBuilder;
-import org.opendatakit.aggregate.form.FormInfoTable;
 import org.opendatakit.aggregate.server.ServerPreferencesProperties;
 import org.opendatakit.common.persistence.CommonFieldsBase;
 import org.opendatakit.common.persistence.DataField;
@@ -46,6 +40,11 @@ import org.opendatakit.common.security.common.EmailParser.Email;
 import org.opendatakit.common.utils.WebUtils;
 import org.opendatakit.common.web.CallingContext;
 import org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Table of registered users of the system. Currently, only the password fields,
@@ -331,7 +330,6 @@ public final class RegisteredUsersTable extends CommonFieldsBase {
    * 
    * @param username
    * @param datastore
-   * @param user
    * @return
    * @throws ODKDatastoreException
    */
@@ -481,6 +479,8 @@ public final class RegisteredUsersTable extends CommonFieldsBase {
       r.setFullName(u.getFullName());
       r.setIsRemoved(false);
       ds.putEntity(r, user);
+      logger.debug("I'm registering user " + u.getUsername() + u.getEmail());
+
       return r;
     } else {
       t.setFullName(u.getFullName());

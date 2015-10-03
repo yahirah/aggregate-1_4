@@ -16,13 +16,12 @@
 
 package org.opendatakit.aggregate.client.widgets;
 
-import java.util.ArrayList;
-
+import com.google.gwt.event.dom.client.ChangeHandler;
 import org.opendatakit.aggregate.client.form.FormSummary;
 import org.opendatakit.aggregate.constants.common.FormActionStatusTimestamp;
 import org.opendatakit.common.web.constants.BasicConsts;
 
-import com.google.gwt.event.dom.client.ChangeHandler;
+import java.util.ArrayList;
 
 public final class FormListBox extends AggregateListBox {
 	private static final String TOOLTIP_TEXT = "Form to use";
@@ -51,7 +50,7 @@ public final class FormListBox extends AggregateListBox {
 
 		if (forms == null || forms.size() == 0) {
 			forms = new ArrayList<FormSummary>();
-			forms.add(new FormSummary(NO_FORM, BasicConsts.EMPTY_STRING, null, null, false, false, null, 0));
+			forms.add(new FormSummary(NO_FORM, BasicConsts.EMPTY_STRING, null, null, false, false, null, 0, -1L));
 		}
 
 		clear();

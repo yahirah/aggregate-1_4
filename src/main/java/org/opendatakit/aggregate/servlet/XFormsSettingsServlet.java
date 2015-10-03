@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * Created by Anna on 2015-08-09.
+ * Servlet that allows user to download the settings for particular form.
+ * @author Anna
  */
 public class XFormsSettingsServlet extends ServletUtilBase {
   /**

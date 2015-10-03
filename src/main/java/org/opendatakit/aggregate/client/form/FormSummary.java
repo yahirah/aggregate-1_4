@@ -16,16 +16,17 @@
 
 package org.opendatakit.aggregate.client.form;
 
+import org.opendatakit.aggregate.constants.common.FormActionStatusTimestamp;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import org.opendatakit.aggregate.constants.common.FormActionStatusTimestamp;
 
 public final class FormSummary implements Serializable {
 
   private static final long serialVersionUID = 5320217439717436812L;
   private String title;
   private String id;
+  private Long aclId;
   // creation date is the date the form was uploaded to Aggregate...
   private Date creationDate;
   private String createdUser;
@@ -45,7 +46,7 @@ public final class FormSummary implements Serializable {
   }
 
   public FormSummary(String formTitle, String formId, Date creationDate, String formCreateUser,
-		  boolean download, boolean receiveSubmissions, String viewableURL, int mediaFileCount) {
+		  boolean download, boolean receiveSubmissions, String viewableURL, int mediaFileCount, Long acl) {
     this.title = formTitle;
     this.id = formId;
     this.creationDate = creationDate;
@@ -54,6 +55,7 @@ public final class FormSummary implements Serializable {
     this.receiveSubmissions = receiveSubmissions;
     this.viewURL = viewableURL;
     this.mediaFileCount = mediaFileCount;
+    this.aclId = acl;
   }
 
   public String getTitle() {
@@ -62,6 +64,10 @@ public final class FormSummary implements Serializable {
 
   public String getId() {
     return id;
+  }
+
+  public Long getAclId() {
+    return aclId;
   }
 
   public Date getCreationDate() {

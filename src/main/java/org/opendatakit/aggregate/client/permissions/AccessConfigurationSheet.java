@@ -16,34 +16,6 @@
 
 package org.opendatakit.aggregate.client.permissions;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeSet;
-
-import org.opendatakit.aggregate.client.AggregateUI;
-import org.opendatakit.aggregate.client.PermissionsSubTab;
-import org.opendatakit.aggregate.client.SecureGWT;
-import org.opendatakit.aggregate.client.popups.ChangePasswordPopup;
-import org.opendatakit.aggregate.client.popups.ConfirmUserDeletePopup;
-import org.opendatakit.aggregate.client.preferences.Preferences;
-import org.opendatakit.common.security.client.UserSecurityInfo;
-import org.opendatakit.common.security.client.UserSecurityInfo.UserType;
-import org.opendatakit.common.security.common.EmailParser;
-import org.opendatakit.common.security.common.EmailParser.Email;
-import org.opendatakit.common.security.common.GrantedAuthorityName;
-import org.opendatakit.common.web.client.BooleanValidationPredicate;
-import org.opendatakit.common.web.client.StringValidationPredicate;
-import org.opendatakit.common.web.client.UIEnabledActionCell;
-import org.opendatakit.common.web.client.UIEnabledActionColumn;
-import org.opendatakit.common.web.client.UIEnabledPredicate;
-import org.opendatakit.common.web.client.UIEnabledValidatingCheckboxColumn;
-import org.opendatakit.common.web.client.UIEnabledValidatingSelectionColumn;
-import org.opendatakit.common.web.client.UIEnabledValidatingTextInputColumn;
-import org.opendatakit.common.web.client.UIVisiblePredicate;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -57,13 +29,27 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
+import org.opendatakit.aggregate.client.AggregateUI;
+import org.opendatakit.aggregate.client.PermissionsSubTab;
+import org.opendatakit.aggregate.client.SecureGWT;
+import org.opendatakit.aggregate.client.form.FormSummary;
+import org.opendatakit.aggregate.client.popups.ChangePasswordPopup;
+import org.opendatakit.aggregate.client.popups.ConfirmUserDeletePopup;
+import org.opendatakit.aggregate.client.preferences.Preferences;
+import org.opendatakit.common.security.client.CredentialsInfo;
+import org.opendatakit.common.security.client.RealmSecurityInfo;
+import org.opendatakit.common.security.client.UserSecurityInfo;
+import org.opendatakit.common.security.client.UserSecurityInfo.UserType;
+import org.opendatakit.common.security.common.EmailParser;
+import org.opendatakit.common.security.common.EmailParser.Email;
+import org.opendatakit.common.security.common.GrantedAuthorityName;
+import org.opendatakit.common.web.client.*;
+
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AccessConfigurationSheet extends Composite {
 
@@ -74,6 +60,10 @@ public class AccessConfigurationSheet extends Composite {
   private static final ArrayList<String> userType;
   private static final String ACCOUNT_TYPE_ODK = "ODK";
   private static final String ACCOUNT_TYPE_GOOGLE = "Google";
+  private List<PreUser> preUsers;
+  private boolean newUsers = false;
+  private String baseUrl;
+  private static final Logger logger = Logger.getLogger("AccessConfigurationSheet");
 
   static {
     userType = new ArrayList<String>();
@@ -83,6 +73,7 @@ public class AccessConfigurationSheet extends Composite {
 
   private static TemporaryAccessConfigurationSheetUiBinder uiBinder = GWT
       .create(TemporaryAccessConfigurationSheetUiBinder.class);
+
 
   interface TemporaryAccessConfigurationSheetUiBinder extends
       UiBinder<Widget, AccessConfigurationSheet> {
@@ -357,7 +348,7 @@ public class AccessConfigurationSheet extends Composite {
     allGroups.add(GrantedAuthorityName.GROUP_DATA_COLLECTORS);
     allGroups.add(GrantedAuthorityName.USER_IS_ANONYMOUS);
 
-    ArrayList<UserSecurityInfo> users = new ArrayList<UserSecurityInfo>();
+    final ArrayList<UserSecurityInfo> users = new ArrayList<UserSecurityInfo>();
     users.addAll(dataProvider.getList());
     for (UserSecurityInfo i : users) {
       if (i.getType() == UserType.ANONYMOUS) {
@@ -389,9 +380,13 @@ public class AccessConfigurationSheet extends Composite {
           @Override
           public void onSuccess(Void result) {
             SecureGWT.getSecurityAdminService().getAllUsers(true, new UpdateUserDisplay());
+            if (newUsers) {
+              assignNewPasswords(preUsers);
+            }
           }
         });
   }
+
 
   private static final class VisibleNotAnonymousPredicate implements
       UIVisiblePredicate<UserSecurityInfo> {
@@ -753,6 +748,24 @@ public class AccessConfigurationSheet extends Composite {
     dataProvider.addDataDisplay(userTable);
 
     userTable.addColumnSortHandler(columnSortHandler);
+
+    fillFormsList();
+  }
+
+  private void fillFormsList() {
+    forms.addItem("--Pick form---", "");
+    SecureGWT.getFormService().getForms(new AsyncCallback<ArrayList<FormSummary>>() {
+
+      public void onFailure(Throwable throwable) {
+        System.out.println(throwable.getMessage());
+      }
+
+      public void onSuccess(ArrayList<FormSummary> formSummaries) {
+        for(FormSummary form : formSummaries) {
+          forms.addItem(form.getTitle(), String.valueOf(form.getAclId()));
+        }
+      }
+    });
   }
 
   public void changeTablesPrivilegesVisibility(boolean isVisible) {
@@ -794,6 +807,12 @@ public class AccessConfigurationSheet extends Composite {
   @UiField
   Button addNow;
   @UiField
+  ListBox forms;
+  @UiField
+  TextArea addedUsersWithPass;
+  @UiField
+  Button addUsers;
+  @UiField
   CellTable<UserSecurityInfo> userTable;
   @UiField
   CheckBox anonymousAttachmentViewers;
@@ -806,10 +825,142 @@ public class AccessConfigurationSheet extends Composite {
     uiOutOfSyncWithServer();
   }
 
+  @UiHandler("addUsers")
+  void onAddUsersWithPassClick(ClickEvent e) {
+    String formId = forms.getSelectedValue();
+    if(formId == null || formId == "") {
+      Window
+          .alert("You have not picked to which form assign new users!");
+      return;
+    }
+
+    String text = addedUsersWithPass.getText();
+    if(text == null) {
+      Window
+          .alert("The user and password field is in wrong format. Correct format: user,password \n user2,password2");
+      return;
+    }
+    if (text.trim().equals("")) {
+      Window
+          .alert("There are no users suggested");
+      return;
+    }
+    // create dropdown with forms
+    preUsers = UserParser.retrievePreUsers(text, formId);
+    System.out.println(preUsers.size());
+    HashMap<String, UserSecurityInfo> localUsers = new HashMap<String, UserSecurityInfo>();
+    HashMap<String, UserSecurityInfo> googleUsers = new HashMap<String, UserSecurityInfo>();
+    List<UserSecurityInfo> list = dataProvider.getList();
+    for (UserSecurityInfo u : list) {
+      if (u.getUsername() != null) {
+        localUsers.put(u.getUsername(), u);
+      } else {
+        googleUsers.put(u.getEmail(), u);
+      }
+    }
+    int nAdded = 0;
+    for (PreUser user : preUsers) {
+      UserSecurityInfo u = localUsers.get(user.getName());
+      if (u == null) {
+        u = new UserSecurityInfo(user.getName(), user.getName(), null,
+                                 UserType.REGISTERED);
+        list.add(u);
+        localUsers.put(u.getUsername(), u);
+
+        ++nAdded;
+      }
+    }
+    if (nAdded != 0) {
+      userTable.setPageSize(Math.max(15, list.size()));
+      newUsers = true;
+      uiOutOfSyncWithServer();
+      updateUsersOnServer();
+      addedUsersWithPass.setText("");
+      //assign data collector role
+    }
+  }
+
+  private void assignNewPasswords(List<PreUser> users) {
+    GWT.log("AggregateUI.getRealmInfo: triggering refresh of realmInfo");
+    RealmSecurityInfo realmInfo = AggregateUI.getUI().getRealmInfo();
+    List<CredentialsInfo> credentials = new ArrayList<CredentialsInfo>();
+    for(PreUser user : users) {
+      CredentialsInfo credential = null;
+      try {
+        credential = CredentialsInfoBuilder.build(user.getName(), realmInfo, user.getPassword());
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      credentials.add(credential);
+    }
+    SecureGWT.getSecurityService().changePasswords(credentials,
+        new AsyncCallback<Integer>() {
+
+          public void onFailure(Throwable throwable) {
+
+            System.out.println("failure");
+          }
+
+          public void onSuccess(Integer result) {
+            if (newUsers) {
+              assignToForm(preUsers, forms.getSelectedValue());
+            }
+            logger.log(Level.INFO, "Number of results:" + result.toString());
+          }
+        });
+  }
+
+
+  private void assignToForm(final List<PreUser> preUsers, String formId) {
+    List<String> usernames = new ArrayList<String>();
+    for(PreUser pre : preUsers) {
+      String user = pre.getName();
+      usernames.add(user);
+    }
+
+    SecureGWT.getSecurityService().assignUsersToForm(usernames, formId,
+        new AsyncCallback<Void>() {
+
+          public void onFailure(Throwable throwable) {
+            logger.log(Level.SEVERE, "Assigning user to form failed");
+
+          }
+
+          public void onSuccess(Void result) {
+            newUsers = false;
+            assignToCollectorRole(dataProvider.getList(), preUsers);
+            logger.log(Level.SEVERE, "We have " + String.valueOf(dataProvider.getList().size()));
+            Window.alert("Users\' creation and assignment succesful!");
+          }
+        });
+  }
+
+
+  private void assignToCollectorRole(List<UserSecurityInfo> users, List<PreUser> pres){
+    List<UserSecurityInfo> collectors = new ArrayList<UserSecurityInfo>();
+    boolean added = false;
+    for(UserSecurityInfo user : users) {
+      for(PreUser pr : pres) {
+        if(pr.getName().equals(user.getUsername())) {
+          user.getAssignedUserGroups().add(GrantedAuthorityName.GROUP_DATA_COLLECTORS);
+          collectors.add(user);
+          added = true;
+        }
+      }
+      if (added != true || user.getAssignedUserGroups().contains(GrantedAuthorityName.GROUP_DATA_COLLECTORS)) {
+        collectors.add(user);
+      }
+      added = false;
+    }
+    isUiOutOfSyncWithServer();
+    updateUsersOnServer();
+  }
+
   @UiHandler("addNow")
   void onAddUsersClick(ClickEvent e) {
     String text = addedUsers.getText();
     Collection<Email> emails = EmailParser.parseEmails(text);
+    System.out.println(emails.toString());
     HashMap<String, UserSecurityInfo> localUsers = new HashMap<String, UserSecurityInfo>();
     HashMap<String, UserSecurityInfo> googleUsers = new HashMap<String, UserSecurityInfo>();
     List<UserSecurityInfo> list = dataProvider.getList();
@@ -827,7 +978,7 @@ public class AccessConfigurationSheet extends Composite {
           .getEmail());
       if (u == null) {
         u = new UserSecurityInfo(email.getUsername(), email.getFullName(), email.getEmail(),
-                                 UserType.REGISTERED);
+            UserType.REGISTERED);
         list.add(u);
         if (localUser) {
           localUsers.put(u.getUsername(), u);
