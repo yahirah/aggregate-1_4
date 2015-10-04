@@ -107,6 +107,7 @@ public interface IForm {
 
   public BinaryContentManipulator getSettingsFileset();
 
+  public String getSettingsXml(CallingContext cc) throws ODKDatastoreException;
   /**
    * Get the name that is viewable on ODK Aggregate
    * 

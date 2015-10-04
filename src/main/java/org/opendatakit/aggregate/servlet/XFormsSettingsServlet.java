@@ -1,11 +1,12 @@
 package org.opendatakit.aggregate.servlet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opendatakit.aggregate.ContextFactory;
 import org.opendatakit.aggregate.constants.ServletConsts;
 import org.opendatakit.aggregate.exception.ODKFormNotFoundException;
 import org.opendatakit.aggregate.form.FormFactory;
 import org.opendatakit.aggregate.form.IForm;
-import org.opendatakit.aggregate.format.form.XFormsSettingsXmlTable;
 import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.persistence.exception.ODKOverQuotaException;
 import org.opendatakit.common.web.CallingContext;
@@ -26,6 +27,7 @@ public class XFormsSettingsServlet extends ServletUtilBase {
    */
   private static final long serialVersionUID = 23886844567070038L;
 
+  private static final Log logger = LogFactory.getLog(XFormsSettingsServlet.class.getName());
   /**
    * URI from base
    */
@@ -51,8 +53,10 @@ public class XFormsSettingsServlet extends ServletUtilBase {
     }
 
     IForm form;
+    String xml;
     try {
       form = FormFactory.retrieveFormByFormId(formId, cc);
+      xml = form.getSettingsXml(cc);
     } catch (ODKFormNotFoundException e) {
       e.printStackTrace();
       odkIdNotFoundError(resp);
@@ -66,21 +70,11 @@ public class XFormsSettingsServlet extends ServletUtilBase {
       datastoreError(resp);
       return;
     }
-
-    XFormsSettingsXmlTable formFormatter = new XFormsSettingsXmlTable(form, cc.getServerURL());
+    logger.info(xml.substring(0,50));
     resp.setContentType(HtmlConsts.RESP_TYPE_XML);
     PrintWriter out = resp.getWriter();
-    try {
-      formFormatter.generateXmlSettingsList(out, cc);
-    } catch (ODKOverQuotaException e) {
-      e.printStackTrace();
-      quotaExceededError(resp);
-      return;
-    } catch (ODKDatastoreException e) {
-      e.printStackTrace();
-      datastoreError(resp);
-      return;
-    }
+    out.write(xml);
+    out.flush();
   }
 }
 

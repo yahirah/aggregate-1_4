@@ -43,7 +43,6 @@ import org.opendatakit.common.web.constants.BasicConsts;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.security.acl.Acl;
 import java.util.*;
 
 /**
@@ -254,7 +253,7 @@ class Form implements IForm {
     entryOwnerRow.setBooleanField(AclTable.GRANTED, true);
     ds.putEntity(entryOwnerRow, user);
     logger.info("Generating owner rights to form " + getId().toString() + " for " + user.getNickname());
-    if(user.getId() != AclTable.DEFAULT_ID) {
+    if(user.getId() != AclTable.DEFAULT_ADMIN_ID) {
       AclTable.addAdminAccess(getId(), cc);
       logger.info("Generating user rights to form " + getId().toString() + " for admin");
     }
@@ -284,7 +283,7 @@ class Form implements IForm {
     xform.deleteAll(cc);
     settings.deleteAll(cc);
 
-    AclTable.deleteEntriesFor(getId(), cc);
+    AclTable.deleteEntriesForForm(getId(), cc);
     ds.deleteEntity(filesetRow.getEntityKey(), user);
     ds.deleteEntity(infoRow.getEntityKey(), user);
     ds.deleteEntity(settingsRow.getEntityKey(), user);
@@ -658,9 +657,7 @@ class Form implements IForm {
 
     String viewableURL = HtmlUtil.createHrefWithProperties(
         cc.getWebApplicationURL(FormXmlServlet.WWW_ADDR), xmlProperties, getViewableName(), false);
-    logger.debug("**************************");
-    logger.debug("File set number: " + getSettingsFileset().getAttachmentCount(cc));
-    int mediaFileCount = getManifestFileset().getAttachmentCount(cc) + getSettingsFileset().getAttachmentCount(cc);
+    int mediaFileCount = getManifestFileset().getAttachmentCount(cc);
     return new FormSummary(getViewableName(), getFormId(), getCreationDate(), getCreationUser(),
         downloadable, submit, viewableURL, mediaFileCount,getId());
   }

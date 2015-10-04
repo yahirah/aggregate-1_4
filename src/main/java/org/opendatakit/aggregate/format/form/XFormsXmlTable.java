@@ -166,17 +166,6 @@ public class XFormsXmlTable {
       manifestUrlElement.addChild(0, Node.TEXT, urlLink);
       xformElement.addChild(xfIdx++, Node.IGNORABLE_WHITESPACE, BasicConsts.NEW_LINE);
     }
-    if (form.hasSettingsFileset(cc)) {
-      Map<String, String> properties = new HashMap<String, String>();
-      properties.put(ServletConsts.FORM_ID, form.getFormId());
-      String urlLink = HtmlUtil.createLinkWithProperties(settingsRequestURL, properties);
-
-      Element settingsUrlElement = d.createElement(XML_TAG_NAMESPACE,
-          XFormsTableConsts.MANIFEST_URL_TAG);
-      xformElement.addChild(xfIdx++, Node.ELEMENT, settingsUrlElement);
-      settingsUrlElement.addChild(0, Node.TEXT, urlLink);
-      xformElement.addChild(xfIdx++, Node.IGNORABLE_WHITESPACE, BasicConsts.NEW_LINE);
-    }
     e.addChild(idx++, Node.IGNORABLE_WHITESPACE, BasicConsts.NEW_LINE);
     return idx;
   }

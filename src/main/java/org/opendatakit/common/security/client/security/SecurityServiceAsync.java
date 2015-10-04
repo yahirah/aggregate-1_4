@@ -21,6 +21,7 @@ import org.opendatakit.common.security.client.CredentialsInfo;
 import org.opendatakit.common.security.client.RealmSecurityInfo;
 import org.opendatakit.common.security.client.UserSecurityInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface SecurityServiceAsync {
@@ -33,4 +34,8 @@ public interface SecurityServiceAsync {
 	void changePasswords(List<CredentialsInfo> users, AsyncCallback<Integer> successes);
 
 	void assignUsersToForm(List<String> usernames, String formId, AsyncCallback<Void> callback);
+
+	void getUserAssignedToForm(String formId, AsyncCallback<ArrayList<UserSecurityInfo>> callback);
+
+	void removeUsersFromForm(List<String> usernames, String formId, AsyncCallback<Integer> callback);
 }

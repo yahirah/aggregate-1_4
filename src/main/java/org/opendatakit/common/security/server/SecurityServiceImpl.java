@@ -179,4 +179,52 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements
     }
     logger.info("Generating access rights to form " + formId.toString() + " for " + usernames.size() + " users");
   }
+
+  public ArrayList<UserSecurityInfo> getUserAssignedToForm(String formId) {
+    logger.info("Getting user assigned to form");
+
+    HttpServletRequest req = this.getThreadLocalRequest();
+    CallingContext cc = ContextFactory.getCallingContext(this, req);
+
+    ArrayList<UserSecurityInfo> users = null;
+    try {
+      users = SecurityServiceUtil.getUsersForForm(formId, cc);
+    } catch (ODKDatastoreException e) {
+      logger.warn("Error with database while retrieving access list to " + formId);
+      e.printStackTrace();
+    }
+
+    return users;
+  }
+
+  public Integer removeUsersFromForm(List<String> usernames, String formId) {
+    logger.warn("Removing users from form");
+    HttpServletRequest req = this.getThreadLocalRequest();
+    CallingContext cc = ContextFactory.getCallingContext(this, req);
+    Datastore ds = cc.getDatastore();
+    logger.warn("Removing " + usernames.size() + " users to " + formId);
+    List<Long> ids = new ArrayList<Long>();
+    try {
+      Integer outcome = 0;
+      for(String username : usernames) {
+        RegisteredUsersTable userDefinition = RegisteredUsersTable.getUserByUsername(username,
+            cc.getUserService(), ds);
+        if (userDefinition == null) {
+          throw new AccessDeniedException("User is not a registered user.");
+        }
+        ids.add(userDefinition.getId());
+        outcome++;
+      }
+      SecurityServiceUtil.removeUsersFromForm(ids, formId, cc);
+      return outcome;
+    } catch (ODKDatastoreException e) {
+      logger.warn("Error with database while Removing access from " + formId);
+      e.printStackTrace();
+    } catch (AccessDeniedException e) {
+      logger.warn("Access denied while Removing access from " + formId);
+      e.printStackTrace();
+    }
+    logger.info("Removing access rights to form " + formId.toString() + " for " + usernames.size() + " users");
+    return 0;
+  }
 }

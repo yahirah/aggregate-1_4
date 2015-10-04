@@ -24,6 +24,7 @@ import org.opendatakit.common.security.client.RealmSecurityInfo;
 import org.opendatakit.common.security.client.UserSecurityInfo;
 import org.opendatakit.common.security.client.exception.AccessDeniedException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,4 +57,10 @@ public interface SecurityService extends RemoteService {
 	Integer changePasswords(List<CredentialsInfo> users);
 
 	void assignUsersToForm(List<String> usernames, String formId);
+
+	ArrayList<UserSecurityInfo> getUserAssignedToForm(String formId);
+
+	Integer removeUsersFromForm(List<String> usernames, String formId);
+
+
 }

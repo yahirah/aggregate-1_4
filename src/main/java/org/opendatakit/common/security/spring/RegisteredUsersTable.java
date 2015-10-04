@@ -437,6 +437,29 @@ public final class RegisteredUsersTable extends CommonFieldsBase {
     }
   }
 
+  public static RegisteredUsersTable getUserById(Long id, UserService userService, Datastore datastore) throws ODKDatastoreException {
+    logger.warn("Searching for id " + id.toString());
+    if (id.equals(AclTable.ANONYMOUS_ID)) {
+      return null;
+    }
+    User user = userService.getDaemonAccountUser();
+    RegisteredUsersTable prototype = assertRelation(datastore, user);
+    Query q = datastore.createQuery(prototype, "RegisteredUsersTable.getUserById", user);
+    q.addFilter(ACL_ID, FilterOperation.EQUAL, id);
+    q.addSort(LOCAL_USERNAME, Direction.DESCENDING); // GAE work-around
+    q.addFilter(IS_REMOVED, FilterOperation.EQUAL, false);
+    @SuppressWarnings("unchecked")
+    List<RegisteredUsersTable> l = (List<RegisteredUsersTable>) q.executeQuery();
+    logger.warn("FOUND" + l.size() + " USERS");
+    if (l.size() == 0) {
+      logger.warn("NO USER FOUND");
+      return null;
+    } else {
+      return l.get(0);
+    }
+  }
+
+
   /**
    * If the given username is not present, this will create a record for the
    * user, marking them as active (able to log in via OAuth2 or Aggregate
@@ -607,4 +630,5 @@ public final class RegisteredUsersTable extends CommonFieldsBase {
     }
     return tList;
   }
+
 }

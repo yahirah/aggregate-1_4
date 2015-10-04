@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opendatakit.common.persistence.CommonFieldsBase;
 import org.opendatakit.common.persistence.Datastore;
 import org.opendatakit.common.persistence.Query;
@@ -55,6 +57,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  *
  */
 public class SecurityServiceUtil {
+
+  private static final Log logger = LogFactory.getLog(SecurityServiceUtil.class.getName());
 
   private static final Set<String> specialNames = new HashSet<String>();
 
@@ -690,7 +694,6 @@ public class SecurityServiceUtil {
   public static void assignUserToForm(List<Long> ids, String formId, CallingContext cc) throws ODKDatastoreException {
     Datastore ds = cc.getDatastore();
     User user = cc.getCurrentUser();
-    RegisteredUsersTable userDefinition = null;
     List<CommonFieldsBase> newEntries = new ArrayList<CommonFieldsBase>();
     AclTable entryRelation = null;
     entryRelation = AclTable.assertRelation(ds, user);
@@ -703,5 +706,29 @@ public class SecurityServiceUtil {
       newEntries.add(entryAccessRow);
     }
     ds.putEntities(newEntries, user);
+  }
+
+  public static ArrayList<UserSecurityInfo> getUsersForForm(String formId, CallingContext cc) throws ODKDatastoreException {
+    Datastore ds = cc.getDatastore();
+
+    ArrayList<UserSecurityInfo> results = new ArrayList<UserSecurityInfo>();
+    List<Long> ids = AclTable.getUserIdsForForm(formId, cc);
+    for (Long id : ids) {
+      RegisteredUsersTable userEntry = RegisteredUsersTable.getUserById(id, cc.getUserService(), ds);
+      logger.warn("We've found for id " + id.toString() + " user " + userEntry);
+      if (userEntry != null) {
+        UserSecurityInfo info = new UserSecurityInfo(userEntry.getUsername(), userEntry.getFullName(), userEntry.getEmail(),
+          UserSecurityInfo.UserType.REGISTERED);
+        results.add(info);
+      }
+    }
+
+    return results;
+  }
+
+  public static void removeUsersFromForm(List<Long> ids, String formId, CallingContext cc) throws ODKDatastoreException {
+    for(Long id: ids) {
+      AclTable.deleteEntryForUser(id, Long.valueOf(formId), cc);
+    }
   }
 }

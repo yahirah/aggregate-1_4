@@ -61,7 +61,7 @@ public final class ServletConsts {
   /**
    * Name of  field that contains the settings name value (settings upload)
    */
-  public final static String SETTINGS_NAME = "setings_name";
+  public final static String SETTINGS_NAME = "settings_name";
   /**
    * The name of the property that includes the form id
    */

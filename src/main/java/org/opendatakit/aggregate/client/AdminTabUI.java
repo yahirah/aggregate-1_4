@@ -26,6 +26,7 @@ public class AdminTabUI extends AggregateTabBase {
 
   private PermissionsSubTab permissionsSubTab;
   private OdkTablesAdminSubTab odkTablesAdminTab;
+  private AssignmentSubTab assignmentSubTab;
 
   public AdminTabUI(AggregateUI baseUI) {
     super();
@@ -35,9 +36,12 @@ public class AdminTabUI extends AggregateTabBase {
     addSubTab(permissionsSubTab, SubTabs.PERMISSIONS);
     addSubTab(new PreferencesSubTab(), SubTabs.PREFERENCES);
 
+    assignmentSubTab = new AssignmentSubTab();
+    addSubTab(assignmentSubTab, SubTabs.ASSIGNMENTS);
+/*
     odkTablesAdminTab = new OdkTablesAdminSubTab();
     addSubTab(odkTablesAdminTab, SubTabs.TABLES);
-
+*/
     // show panel by default, so need to hide it
     if(!Preferences.getOdkTablesEnabled()) {
       hideOdkTablesSubTab();

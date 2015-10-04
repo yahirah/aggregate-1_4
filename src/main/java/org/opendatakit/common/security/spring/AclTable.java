@@ -10,6 +10,7 @@ import org.opendatakit.common.persistence.exception.ODKDatastoreException;
 import org.opendatakit.common.security.User;
 import org.opendatakit.common.web.CallingContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +34,8 @@ public class AclTable extends CommonFieldsBase {
   private static final Log logger = LogFactory.getLog(AclTable.class);
 
   private static final String TABLE_NAME = "_acl_entry";
-  public static final Long DEFAULT_ID = 1L;
+  public static final Long ANONYMOUS_ID = 0L;
+  public static final Long DEFAULT_ADMIN_ID = 1L;
 
 
 
@@ -126,13 +128,13 @@ public class AclTable extends CommonFieldsBase {
     AclTable entryRow = ds.createEntityUsingRelation(relation,user);
     entryRow.setStringField(OBJECT_CLASS, ProtectedClasses.FORM.getType());
     entryRow.setLongField(OBJECT_IDENTITY, formAclId);
-    entryRow.setLongField(SID, DEFAULT_ID);
+    entryRow.setLongField(SID, DEFAULT_ADMIN_ID);
     entryRow.setBooleanField(GRANTED, true);
     logger.info("Generating user rights to first Form");
     ds.putEntity(entryRow, user);
   }
 
-  public static void deleteEntriesFor(Long id, CallingContext bootstrapCc) throws ODKDatastoreException {
+  public static void deleteEntriesForForm(Long id, CallingContext bootstrapCc) throws ODKDatastoreException {
     Datastore ds = bootstrapCc.getDatastore();
     User user = bootstrapCc.getCurrentUser();
 
@@ -142,5 +144,44 @@ public class AclTable extends CommonFieldsBase {
     for (AclTable entry : rows) {
       ds.deleteEntity(entry.getEntityKey(), user);
     }
+  }
+
+
+  public static void deleteEntryForUser(Long userId, Long form, CallingContext bootstrapCc) throws
+      ODKDatastoreException {
+    Datastore ds = bootstrapCc.getDatastore();
+    User user = bootstrapCc.getCurrentUser();
+
+    Query q = ds.createQuery(relation, "AclTable.deletingEntries", user);
+    q.addFilter(AclTable.SID, Query.FilterOperation.EQUAL, userId);
+    q.addFilter(AclTable.OBJECT_IDENTITY, Query.FilterOperation.EQUAL, form);
+    List<AclTable> rows = (List<AclTable>) q.executeQuery();
+    for (AclTable entry : rows) {
+      ds.deleteEntity(entry.getEntityKey(), user);
+    }
+  }
+
+
+  public static List<Long> getUserIdsForForm(String formId, CallingContext cc) throws ODKDatastoreException {
+    Datastore ds = cc.getDatastore();
+    User user = cc.getCurrentUser();
+
+    AclTable prototype = assertRelation(ds, user);
+    Query q = AclTable.createQuery(ds, "AclTable.getUserIdsForForm",
+        user);
+    // already applied: q.addFilter(IS_REMOVED, FilterOperation.EQUAL, false);
+    q.addFilter(OBJECT_CLASS, Query.FilterOperation.EQUAL, ProtectedClasses.FORM.getType());
+    q.addFilter(OBJECT_IDENTITY, Query.FilterOperation.EQUAL, Long.valueOf(formId));
+    q.addSort(SID, Query.Direction.ASCENDING);
+    @SuppressWarnings("unchecked")
+
+    List<AclTable> entries = (List<AclTable>) q.executeQuery();
+    List<Long> ids = new ArrayList<Long>();
+    for (AclTable entry : entries) {
+      ids.add(entry.getLongField(SID));
+      logger.debug(entry.getLongField(SID));
+    }
+    logger.info("Returning " + ids.size() + " ids");
+    return ids;
   }
 }
