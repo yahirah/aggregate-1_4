@@ -96,3 +96,6 @@ local.properties
 
 
 *.jsdtscope
+
+!src/main/libs/*.jar
+!src/main/libs/*.zip
